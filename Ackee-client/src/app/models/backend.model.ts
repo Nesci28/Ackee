@@ -20,9 +20,14 @@ export interface Domains {
   data: DomainsData[];
 }
 
-interface ViewsData {
+export interface ViewsData {
   id: { day: number; month: number; year: number };
   count: number;
+}
+
+export interface View {
+  type: string;
+  data: ViewsData;
 }
 
 export interface Views {

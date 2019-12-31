@@ -1,8 +1,17 @@
 <div class="header">
   <div class="header__logo">
-    <div class="header__spinner header__spinner--black"></div>
-    <div class="header__spinner header__spinner--white"></div>
-    <div class="header__spinner header__spinner--primary"></div>
+    <div
+      [ngClass]="{ 'header__spinner--visible': getLoading() }"
+      class="header__spinner header__spinner--black"
+    ></div>
+    <div
+      [ngClass]="{ 'header__spinner--visible': getLoading() }"
+      class="header__spinner header__spinner--white"
+    ></div>
+    <div
+      [ngClass]="{ 'header__spinner--visible': getLoading() }"
+      class="header__spinner header__spinner--primary"
+    ></div>
   </div>
   <div class="header__nav">
     <div class="header__buttons">

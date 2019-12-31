@@ -5,14 +5,18 @@
       <option value="2">Total page views</option>
     </select>
   </form>
-  <div *ngIf="!getLoading()">
+  <div>
     <div class="card">
       <div class="card-body">
         <h3 class="text-left">
           {{ views.value === "1" ? "Site views" : "Page views" }}
         </h3>
-        <h5 class="text-left">{{ chartSubTitle[0] || 0 }}</h5>
+        <app-loading-in-card
+          [type]="'main'"
+          *ngIf="getLoading()"
+        ></app-loading-in-card>
         <canvas
+          *ngIf="!getLoading()"
           baseChart
           [chartType]="'bar'"
           [datasets]="chartData[0]"
@@ -23,21 +27,27 @@
         </canvas>
       </div>
     </div>
-    <div *ngFor="let domain of domains; let i = index">
-      <div class="spacer"></div>
-      <div class="card">
-        <div class="card-body">
-          <h3 class="text-left">{{ domain.title }}</h3>
-          <h5 class="text-left">{{ chartSubTitle[i + 1] || 0 }}</h5>
-          <canvas
-            baseChart
-            [chartType]="'bar'"
-            [datasets]="chartData[i + 1]"
-            [labels]="chartLabels"
-            [options]="chartOptions[i + 1]"
-            [legend]="false"
-          >
-          </canvas>
+    <div class="row">
+      <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
+        <div class="spacer"></div>
+        <div class="card">
+          <div class="card-body">
+            <h3 class="text-left">{{ domain.title }}</h3>
+            <app-loading-in-card
+              [type]="'sub'"
+              *ngIf="getLoading()"
+            ></app-loading-in-card>
+            <canvas
+              *ngIf="!getLoading()"
+              baseChart
+              [chartType]="'bar'"
+              [datasets]="chartData[i + 1]"
+              [labels]="chartLabels"
+              [options]="chartOptions[i + 1]"
+              [legend]="false"
+            >
+            </canvas>
+          </div>
         </div>
       </div>
     </div>

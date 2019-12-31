@@ -14,11 +14,15 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {}
 
-  getRoute(page: string): string {
+  getRoute(): string {
     return this.stateService.state$.value;
   }
 
   setRoute(route: State): void {
     this.stateService.state$.next(route);
+  }
+
+  getLoading(): boolean {
+    return this.stateService.loading$.value;
   }
 }

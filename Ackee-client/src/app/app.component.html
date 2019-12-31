@@ -3,6 +3,7 @@
   <app-login *ngIf="state === State.login"></app-login>
   <div
     [ngClass]="{ 'px-3': state !== State.login, 'py-5': state !== State.login }"
+    class="container"
   >
     <app-views *ngIf="state === State.views"></app-views>
     <app-pages *ngIf="state === State.pages"></app-pages>
