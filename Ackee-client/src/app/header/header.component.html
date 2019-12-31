@@ -1,0 +1,47 @@
+<div class="header">
+  <div class="header__logo">
+    <div class="header__spinner header__spinner--black"></div>
+    <div class="header__spinner header__spinner--white"></div>
+    <div class="header__spinner header__spinner--primary"></div>
+  </div>
+  <div class="header__nav">
+    <div class="header__buttons">
+      <button
+        [ngClass]="{ active: getRoute() === State.views }"
+        class="header__button link"
+        (click)="setRoute(State.views)"
+      >
+        Views</button
+      ><button
+        [ngClass]="{ active: getRoute() === State.pages }"
+        class="header__button link"
+        (click)="setRoute(State.pages)"
+      >
+        Pages</button
+      ><button
+        [ngClass]="{ active: getRoute() === State.referrers }"
+        class="header__button link"
+        (click)="setRoute(State.referrers)"
+      >
+        Referrers</button
+      ><button
+        [ngClass]="{ active: getRoute() === State.durations }"
+        class="header__button link"
+        (click)="setRoute(State.durations)"
+      >
+        Durations</button
+      ><button
+        [ngClass]="{ active: getRoute() === State.languages }"
+        class="header__button link"
+        (click)="setRoute(State.languages)"
+      >
+        Languages</button
+      ><button
+        [ngClass]="{ active: getRoute() === State.settings }"
+        class="header__button link"
+      >
+        Settings
+      </button>
+    </div>
+  </div>
+</div>

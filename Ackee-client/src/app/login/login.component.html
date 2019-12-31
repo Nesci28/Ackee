@@ -1,0 +1,70 @@
+<div class="h-100 d-flex justify-content-center align-items-center">
+  <div class="card">
+    <div class="card-body">
+      <div class="my-5">
+        <h5 class="card-title text-center">Ackee</h5>
+        <h6 class="card-subtitle text-center">
+          Welcome back, sign in to continue.
+        </h6>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="login()" id="ngForm">
+        <input
+          class="d-block w-100 mb-3"
+          type="text"
+          formControlName="username"
+          placeHolder="Username"
+        />
+        <div
+          *ngIf="getError('username')"
+          role="tooltip"
+          class="tooltip show bs-tooltip-bottom"
+          style="position: absolute; top: 0px; left: 0px; will-change: transform; transform: translate(118px, 224px);"
+        >
+          <div class="arrow"></div>
+          <div class="tooltip-inner d-flex align-items-center">
+            <i
+              class="fas fa-exclamation-triangle fa-2x"
+              style="color: orange;"
+            ></i
+            ><span class="ml-2">
+              Please fill out this field.
+            </span>
+          </div>
+        </div>
+        <input
+          class="d-block w-100"
+          type="password"
+          formControlName="password"
+          placeHolder="Password"
+        />
+        <div
+          *ngIf="getError('password')"
+          role="tooltip"
+          class="tooltip show bs-tooltip-bottom"
+          style="position: absolute; top: 0px; left: 0px; will-change: transform; transform: translate(118px, 279px);"
+        >
+          <div class="arrow"></div>
+          <div class="tooltip-inner d-flex align-items-center">
+            <i
+              class="fas fa-exclamation-triangle fa-2x"
+              style="color: orange;"
+            ></i
+            ><span class="ml-2">
+              Please fill out this field.
+            </span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-outline-dark btn-help">Help</button>
+      <button
+        class="btn btn-outline-dark btn-sign-in"
+        (click)="login()"
+        form="ngForm"
+      >
+        Sign In <i class="fas fa-long-arrow-alt-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

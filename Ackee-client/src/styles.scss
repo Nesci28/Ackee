@@ -1,0 +1,95 @@
+/* You can add global styles to this file, and also import other style files */
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "variables";
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: $black;
+  color: $white;
+  min-height: 100vh;
+}
+
+html,
+body {
+  min-height: 100vh;
+  height: auto;
+  margin: 0;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  outline: none;
+}
+
+input,
+select {
+  border: none;
+  background-color: $light;
+  color: $white;
+  border-radius: 5px;
+  padding: 0.5rem 0.5rem;
+}
+
+select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #979997;
+
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  -o-appearance: none;
+  appearance: none;
+
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+
+input:focus,
+select:focus {
+  box-shadow: 0 0 0 2px $primary;
+}
+
+p {
+  margin: 0;
+}
+
+.header-height {
+  min-height: 121px;
+  max-height: 121px;
+}
+
+.card {
+  background-color: $dark;
+  border-radius: 10px;
+}
+
+.card-footer {
+  background-color: $dark;
+}
+
+.btn {
+  border: none;
+  &:hover {
+    box-shadow: 0 0 0 2px $primary;
+  }
+}
+
+.arrow {
+  left: calc(50% - 0.4rem);
+}
+
+.arrow:before {
+  border-bottom-color: $white !important;
+}
+
+.tooltip-inner {
+  background-color: $white !important;
+  color: $black;
+  padding: 0.5rem 0.5rem;
+}

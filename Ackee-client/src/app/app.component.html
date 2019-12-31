@@ -1,0 +1,13 @@
+<div class="base-height">
+  <app-header *ngIf="state !== State.login"></app-header>
+  <app-login *ngIf="state === State.login"></app-login>
+  <div
+    [ngClass]="{ 'px-3': state !== State.login, 'py-5': state !== State.login }"
+  >
+    <app-views *ngIf="state === State.views"></app-views>
+    <app-pages *ngIf="state === State.pages"></app-pages>
+    <app-referrers *ngIf="state === State.referrers"></app-referrers>
+    <app-durations *ngIf="state === State.durations"></app-durations>
+    <app-languages *ngIf="state === State.languages"></app-languages>
+  </div>
+</div>
