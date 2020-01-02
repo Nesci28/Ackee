@@ -45,4 +45,24 @@ export class HttpService {
     );
     return res;
   }
+
+  async getDurations(type: string, domains: AppDomains[]): Promise<Views> {
+    const res: any = { type: "", data: [] };
+    await Promise.all(
+      domains.map(async domain => {
+        const data: any = await this.httpClient
+          .get<Views>(
+            `${environment.url}/domains/${domain.id}/durations?type=${type}`
+          )
+          .toPromise();
+        res.type = data.type;
+        const subArr = [];
+        data.data.forEach((e: View) => {
+          subArr.push(e.data);
+        });
+        res.data.push(subArr);
+      })
+    );
+    return res;
+  }
 }

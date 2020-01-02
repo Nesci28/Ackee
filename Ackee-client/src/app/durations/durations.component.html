@@ -5,14 +5,18 @@
       <option value="2">Detailed durations</option>
     </select>
   </form>
-  <div *ngIf="!getLoading()">
-    <div class="card">
+  <div>
+    <div class="card" *ngIf="durations.value !== '2'">
       <div class="card-body">
         <h3 class="text-left">
-          {{ durations.value === "1" ? "Average durations" : "" }}
+          {{ durations.value === "1" ? "Average Durations" : "EasterEgg" }}
         </h3>
+        <app-loading-in-card
+          [type]="'main'"
+          *ngIf="getLoading()"
+        ></app-loading-in-card>
         <canvas
-          #chart0
+          *ngIf="!getLoading()"
           baseChart
           [chartType]="'bar'"
           [datasets]="chartData[0]"
@@ -23,20 +27,27 @@
         </canvas>
       </div>
     </div>
-    <div *ngFor="let domain of domains; let i = index">
-      <div class="spacer"></div>
-      <div class="card">
-        <div class="card-body">
-          <h3 class="text-left">{{ domain.title }}</h3>
-          <canvas
-            baseChart
-            [chartType]="'bar'"
-            [datasets]="chartData[i + 1]"
-            [labels]="chartLabels"
-            [options]="chartOptions[i + 1]"
-            [legend]="false"
-          >
-          </canvas>
+    <div class="row">
+      <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
+        <div class="spacer"></div>
+        <div class="card">
+          <div class="card-body">
+            <h3 class="text-left">{{ domain.title }}</h3>
+            <app-loading-in-card
+              [type]="'sub'"
+              *ngIf="getLoading()"
+            ></app-loading-in-card>
+            <canvas
+              *ngIf="!getLoading()"
+              baseChart
+              [chartType]="'bar'"
+              [datasets]="chartData[i + 1]"
+              [labels]="chartLabels"
+              [options]="chartOptions[i + 1]"
+              [legend]="false"
+            >
+            </canvas>
+          </div>
         </div>
       </div>
     </div>

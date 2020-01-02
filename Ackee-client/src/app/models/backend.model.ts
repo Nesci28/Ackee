@@ -22,7 +22,8 @@ export interface Domains {
 
 export interface ViewsData {
   id: { day: number; month: number; year: number };
-  count: number;
+  count?: number;
+  average?: number;
 }
 
 export interface View {

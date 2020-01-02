@@ -12,6 +12,7 @@ export class StateService {
   token: string;
   domains: AppDomains[];
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  numberOfDays: BehaviorSubject<number> = new BehaviorSubject<number>(13);
 
   constructor() {}
 }

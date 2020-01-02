@@ -38,8 +38,13 @@ export class ChartsService {
         if (dataArrAll[i + 1][diffDays] === 0.1) {
           dataArrAll[i + 1][diffDays] = 0;
         }
-        dataArrAll[0][diffDays] += viewData.count;
-        dataArrAll[i + 1][diffDays] += viewData.count;
+        if (viewData.count) {
+          dataArrAll[0][diffDays] += viewData.count;
+          dataArrAll[i + 1][diffDays] += viewData.count;
+        } else if (viewData.average) {
+          dataArrAll[0][diffDays] += Math.floor(viewData.average / 1000 / 2);
+          dataArrAll[i + 1][diffDays] += Math.floor(viewData.average / 1000 / 2);
+        }
       });
     });
 

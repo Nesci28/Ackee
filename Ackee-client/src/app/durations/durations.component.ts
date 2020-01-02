@@ -1,5 +1,11 @@
 import { Component, OnInit } from "@angular/core";
+import { FormControl, FormGroup } from "@angular/forms";
 
+import { AppDomains } from "../models/app.model";
+import { Views } from "../models/backend.model";
+import { ChartsService } from "../services/charts.service";
+import { HttpService } from "../services/http.service";
+import { StateService } from "../services/state.service";
 import { BaseComponent } from "../shared/base/base.component";
 
 @Component({
@@ -8,9 +14,85 @@ import { BaseComponent } from "../shared/base/base.component";
   styleUrls: ["./durations.component.scss"]
 })
 export class DurationsComponent extends BaseComponent implements OnInit {
-  constructor() {
+  numberOfDays: number = 13;
+  domains: AppDomains[] = [];
+
+  form: FormGroup = new FormGroup({
+    durations: new FormControl("")
+  });
+
+  data: Views = { type: "", data: [] };
+
+  dataArrAll: any[] = [];
+  chartLabels: string[] = [];
+  chartData: any[] = [];
+  chartOptions: any[] = [];
+  label: { id: number; xLabel: string } = {} as any;
+
+  constructor(
+    private httpService: HttpService,
+    private stateService: StateService,
+    private chartsService: ChartsService
+  ) {
     super();
   }
 
-  ngOnInit() {}
+  async ngOnInit() {
+    this.stateService.loading$.next(true);
+    this.domains = this.stateService.domains;
+    this.durations.setValue("1");
+
+    // Getting the labels
+    this.chartLabels = this.chartsService.createChartLabel(this.stateService.numberOfDays.value);
+    // Fetching the Data
+    this.data = await this.httpService.getDurations(
+      "average",
+      this.stateService.domains
+    );
+    console.log(this.data)
+    // Configuring the Chart
+    const chartsObj = this.chartsService.configureChart(
+      this.data,
+      this.stateService.domains.length,
+      this.stateService.numberOfDays.value,
+      this.label
+    );
+    this.chartData = chartsObj.chartData;
+    this.chartOptions = chartsObj.chartOptions;
+
+    this.stateService.loading$.next(false);
+  }
+
+  get durations() {
+    return this.form.get("durations");
+  }
+
+  async selectChanged(): Promise<void> {
+    this.stateService.loading$.next(true);
+    if (this.durations.value === "1") {
+      this.data = await this.httpService.getDurations(
+        "average",
+        this.stateService.domains
+      );
+    } else {
+      this.data = await this.httpService.getDurations(
+        "detailed",
+        this.stateService.domains
+      );
+    }
+    const chartsObj = this.chartsService.configureChart(
+      this.data,
+      this.stateService.domains.length,
+      this.stateService.numberOfDays.value,
+      this.label
+    );
+    this.chartData = chartsObj.chartData;
+    this.chartOptions = chartsObj.chartOptions;
+
+    this.stateService.loading$.next(false);
+  }
+
+  getLoading(): boolean {
+    return this.stateService.loading$.value;
+  }
 }
