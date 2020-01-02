@@ -62,7 +62,7 @@ export class ChartsService {
         }
       ]);
       chartOptions[i].scales.yAxes[0].ticks.max = Math.max(...data);
-      if (chartOptions[i].scales.yAxes[0].ticks.max === 0.1) {
+      if (chartOptions[i].scales.yAxes[0].ticks.max === 0.1) {``
         chartOptions[i].scales.yAxes[0].ticks.max = 10;
       } else {
         if ((chartOptions[i].scales.yAxes[0].ticks.max & 1) !== 0) {
