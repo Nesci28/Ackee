@@ -1,20 +1,28 @@
 import { Component, OnInit } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { ModalDismissReasons, NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { takeUntil } from "rxjs/operators";
+
+import { environment } from "../../environments/environment";
 import { AppDomains } from "../models/app.model";
+import { Modal } from "../models/state.enum";
+import { HttpService } from "../services/http.service";
 import { StateService } from "../services/state.service";
-import { NgbModal, ModalDismissReasons } from "@ng-bootstrap/ng-bootstrap";
-import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { BaseComponent } from "../shared/base/base.component";
 
 @Component({
   selector: "app-settings",
   templateUrl: "./settings.component.html",
   styleUrls: ["./settings.component.scss"]
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent extends BaseComponent implements OnInit {
   domains: AppDomains[];
+  Modal = Modal;
   closeResult: string;
+  typing: boolean = false;
 
   form = new FormGroup({
-    serverUrl: new FormControl("")
+    trackerName: new FormControl({ value: "", disabled: true })
   });
 
   modalForm = new FormGroup({
@@ -25,15 +33,25 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     private stateService: StateService,
+    private httpService: HttpService,
     private modalService: NgbModal
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.domains = this.stateService.domains;
+    this.httpService
+      .getTrackerName()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(trackerName => {
+        this.trackerName.setValue(`Tracker Name: ${trackerName.name}`);
+        this.stateService.loading$.next(false);
+      });
   }
 
-  get serverUrl() {
-    return this.form.get("serverUrl");
+  get trackerName() {
+    return this.form.get("trackerName");
   }
   get title() {
     return this.modalForm.get("title");
@@ -45,19 +63,48 @@ export class SettingsComponent implements OnInit {
     return this.modalForm.get("code");
   }
 
-  open(content, domain) {
-    const url = this.serverUrl.value;
-    console.log("url :", url);
+  open(content: any, domain: AppDomains) {
+    const url = environment.url;
     this.title.setValue(domain.title);
     this.id.setValue(domain.id);
     this.code.setValue(
-      `<script async src="${url}/tracker.js" data-ackee-server="${url}" data-ackee-domain-id="${domain.id}"></script>`
+      `<script async src="${url}/${this.trackerName.value.replace(
+        "Tracker Name: ",
+        ""
+      )}.js" data-ackee-server="${url}" data-ackee-domain-id="${
+        domain.id
+      }"></script>`
     );
     this.modalService
       .open(content, { windowClass: "dark-modal", centered: true })
       .result.then(
-        result => {
-          this.closeResult = `Closed with: ${result}`;
+        async result => {
+          if (result === Modal.delete) {
+            const r = confirm(
+              `Are you sure you want to delete the domain "${domain.title}"? This action cannot be undone.`
+            );
+            if (r === true) {
+              this.stateService.loading$.next(true);
+              await this.httpService.deleteDomain(domain.id).toPromise();
+              this.stateService.domains = this.stateService.domains.filter(
+                el => el.id !== domain.id
+              );
+              this.domains = this.stateService.domains;
+              this.stateService.loading$.next(false);
+            }
+          } else if (result === Modal.rename) {
+            this.stateService.loading$.next(true);
+            await this.httpService
+              .renameDomain(domain.id, this.title.value)
+              .toPromise();
+            this.stateService.domains.forEach(el => {
+              if (el.id === domain.id) {
+                el.title = this.title.value;
+                this.domains = this.stateService.domains;
+              }
+            });
+            this.stateService.loading$.next(false);
+          }
         },
         reason => {
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

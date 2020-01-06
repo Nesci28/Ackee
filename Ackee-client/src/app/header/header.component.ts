@@ -19,6 +19,7 @@ export class HeaderComponent implements OnInit {
   }
 
   setRoute(route: State): void {
+    this.stateService.loading$.next(true);
     this.stateService.state$.next(route);
   }
 

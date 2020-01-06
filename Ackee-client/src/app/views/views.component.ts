@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { AppDomains } from "../models/app.model";
 import { Views } from "../models/backend.model";
@@ -14,10 +14,10 @@ import { BaseComponent } from "../shared/base/base.component";
   styleUrls: ["./views.component.scss"]
 })
 export class ViewsComponent extends BaseComponent implements OnInit {
-  numberOfDays: number = 13;
   domains: AppDomains[] = [];
 
   form: FormGroup = new FormGroup({
+    numberOfDays: new FormControl(13, Validators.required),
     views: new FormControl("")
   });
 
@@ -43,18 +43,20 @@ export class ViewsComponent extends BaseComponent implements OnInit {
     this.views.setValue("1");
 
     // Getting the labels
-    this.chartLabels = this.chartsService.createChartLabel(this.numberOfDays);
+    this.chartLabels = this.chartsService.createChartLabel(
+      this.numberOfDays.value
+    );
     // Fetching the Data
     this.data = await this.httpService.getViews(
       "unique",
       this.stateService.domains
     );
+
     // Configuring the Chart
     const chartsObj = this.chartsService.configureChart(
       this.data,
-      this.stateService.domains.length,
-      this.numberOfDays,
-      this.label
+      this.stateService.domains,
+      this.numberOfDays.value
     );
     this.chartData = chartsObj.chartData;
     this.chartOptions = chartsObj.chartOptions;
@@ -62,8 +64,27 @@ export class ViewsComponent extends BaseComponent implements OnInit {
     this.stateService.loading$.next(false);
   }
 
+  get numberOfDays() {
+    return this.form.get("numberOfDays");
+  }
   get views() {
     return this.form.get("views");
+  }
+
+  async inputChanged(): Promise<void> {
+    this.stateService.loading$.next(true);
+    this.chartLabels = this.chartsService.createChartLabel(
+      this.numberOfDays.value
+    );
+
+    const chartsObj = this.chartsService.configureChart(
+      this.data,
+      this.stateService.domains,
+      this.numberOfDays.value
+    );
+    this.chartData = chartsObj.chartData;
+    this.chartOptions = chartsObj.chartOptions;
+    this.stateService.loading$.next(false);
   }
 
   async selectChanged(): Promise<void> {
@@ -81,9 +102,8 @@ export class ViewsComponent extends BaseComponent implements OnInit {
     }
     const chartsObj = this.chartsService.configureChart(
       this.data,
-      this.stateService.domains.length,
-      this.numberOfDays,
-      this.label
+      this.stateService.domains,
+      this.numberOfDays.value
     );
     this.chartData = chartsObj.chartData;
     this.chartOptions = chartsObj.chartOptions;

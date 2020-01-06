@@ -1,15 +1,16 @@
 'use strict';
 
 const micro = require('micro');
-const cors = require('micro-cors')();
 const { send, createError } = require('micro');
 const { router, get, post, put, patch, del } = require('microrouter');
 
 const signale = require('./utils/signale');
 const pipe = require('./utils/pipe');
 const isDefined = require('./utils/isDefined');
+const customTrackerUrl = require('./utils/customTrackerUrl');
 const requireAuth = require('./middlewares/requireAuth');
 const blockDemo = require('./middlewares/blockDemo');
+const ui = require('./routes/ui');
 const tokens = require('./routes/tokens');
 const domains = require('./routes/domains');
 const records = require('./routes/records');
@@ -39,6 +40,30 @@ const catchError = fn => async (req, res) => {
   }
 };
 
+// CORS
+const originsString = process.env.ACCESS_CONTROL_ALLOW_ORIGIN;
+const attachCORSHeaders = fn => async (req, res) => {
+  if (!originsString) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  } else {
+    const allowedOrigins = originsString.split(';');
+    const origin = req.headers.origin;
+    if (allowedOrigins.indexOf(origin) > -1) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+  }
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET,PUT,POST,DELETE,OPTIONS,PATCH',
+  );
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json,Authorization',
+  );
+  return await fn(req, res);
+};
+
 const notFound = async req => {
   const err = new Error(`\`${req.url}\` not found`);
 
@@ -46,6 +71,10 @@ const notFound = async req => {
 };
 
 const routes = [
+  get('/tracker.js', ui.tracker),
+  get('/getTrackerName', ui.getTrackerName),
+  customTrackerUrl != null ? get(customTrackerUrl, ui.tracker) : undefined,
+
   post('/tokens', tokens.add),
   del('/tokens/:tokenId', tokens.del),
 
@@ -74,4 +103,4 @@ const routes = [
   del('/*', notFound),
 ].filter(isDefined);
 
-module.exports = micro(cors(catchError(router(...routes))));
+module.exports = micro(attachCORSHeaders(catchError(router(...routes))));

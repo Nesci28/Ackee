@@ -1,5 +1,10 @@
 <div>
-  <form [formGroup]="form" class="w-100 d-flex justify-content-end mb-3">
+  <form [formGroup]="form" class="w-100 d-flex justify-content-between mb-3">
+    <input
+      (change)="inputChanged()"
+      type="number"
+      formControlName="numberOfDays"
+    />
     <select (change)="selectChanged()" formControlName="durations">
       <option value="1" selected>Average durations</option>
       <option value="2">Detailed durations</option>

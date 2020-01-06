@@ -13,12 +13,11 @@
       class="d-flex align-items-center w-100 border-bottom border-secondary"
     >
       <input
-        class="w-100 my-3"
+        class="mx-2 my-3 w-100"
         type="text"
-        placeholder="Server URL ex: https://ackee.now.sh"
-        formControlName="serverUrl"
+        formControlName="trackerName"
+        placeholder="Custom Tracker Name"
       />
-      <i class="ml-2 far fa-check-circle fa-2x"></i>
     </form>
     <button
       class="btn btn-link d-flex justify-content-between align-items-center w-100"
@@ -100,21 +99,21 @@
     <button
       type="button"
       class="btn btn-outline-dark btn-help"
-      (click)="modal.close('Close click')"
+      (click)="modal.close(Modal.close)"
     >
       Close
     </button>
     <button
       type="button"
       class="btn btn-outline-dark btn-help text-danger"
-      (click)="modal.close('Close click')"
+      (click)="modal.close(Modal.delete)"
     >
       Delete
     </button>
     <button
       type="button"
       class="btn btn-outline-dark btn-sign-in text-light"
-      (click)="modal.close('Close click')"
+      (click)="modal.close(Modal.rename)"
     >
       Rename
     </button>

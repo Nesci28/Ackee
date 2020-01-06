@@ -7,3 +7,9 @@ export enum State {
   languages = "languages",
   settings = "settings"
 }
+
+export enum Modal {
+  close = "close",
+  delete = "delete",
+  rename = "rename"
+}
