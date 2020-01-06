@@ -25,7 +25,8 @@ select:focus {
 }
 
 input,
-select {
+select,
+textarea {
   border: none;
   background-color: $light;
   color: $white;
@@ -51,7 +52,8 @@ select {
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   box-shadow: 0 0 0 2px $primary;
 }
 
@@ -70,6 +72,30 @@ select {
 
 option {
   color: $dark;
+}
+
+textarea {
+  min-height: 100px;
+}
+
+.text {
+  &-light {
+    color: hsla(0, 0%, 100%, 0.5) !important;
+  }
+}
+
+.dark-modal {
+  .modal-content {
+    background-color: $dark;
+    color: $white;
+    border-radius: 6px;
+  }
+  .close {
+    color: white;
+  }
+  .close:focus {
+    border: $primary;
+  }
 }
 
 .spacer {
@@ -95,6 +121,22 @@ option {
   border: none;
   &:hover {
     box-shadow: 0 0 0 2px $primary;
+  }
+  &-link {
+    color: $secondary;
+  }
+  &-link:hover,
+  &-link:active,
+  &-link:focus {
+    text-decoration: none;
+    color: $white;
+  }
+}
+
+.px {
+  &-btn {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
 

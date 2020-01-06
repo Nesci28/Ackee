@@ -41,9 +41,12 @@ export class ChartsService {
         if (viewData.count) {
           dataArrAll[0][diffDays] += viewData.count;
           dataArrAll[i + 1][diffDays] += viewData.count;
-        } else if (viewData.average) {
+        }
+        if (viewData.average) {
           dataArrAll[0][diffDays] += Math.floor(viewData.average / 1000 / 2);
-          dataArrAll[i + 1][diffDays] += Math.floor(viewData.average / 1000 / 2);
+          dataArrAll[i + 1][diffDays] += Math.floor(
+            viewData.average / 1000 / 2
+          );
         }
       });
     });
@@ -62,7 +65,8 @@ export class ChartsService {
         }
       ]);
       chartOptions[i].scales.yAxes[0].ticks.max = Math.max(...data);
-      if (chartOptions[i].scales.yAxes[0].ticks.max === 0.1) {``
+      if (chartOptions[i].scales.yAxes[0].ticks.max === 0.1) {
+        ``;
         chartOptions[i].scales.yAxes[0].ticks.max = 10;
       } else {
         if ((chartOptions[i].scales.yAxes[0].ticks.max & 1) !== 0) {

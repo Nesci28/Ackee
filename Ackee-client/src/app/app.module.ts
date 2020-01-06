@@ -18,6 +18,7 @@ import { ReferrersComponent } from './referrers/referrers.component';
 import { DurationsComponent } from './durations/durations.component';
 import { LanguagesComponent } from './languages/languages.component';
 import { LoadingInCardComponent } from './shared/loading-in-card/loading-in-card.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { LoadingInCardComponent } from './shared/loading-in-card/loading-in-card
     ReferrersComponent,
     DurationsComponent,
     LanguagesComponent,
-    LoadingInCardComponent
+    LoadingInCardComponent,
+    SettingsComponent
   ],
   imports: [
     NgbModule,

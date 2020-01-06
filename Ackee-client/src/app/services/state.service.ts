@@ -11,7 +11,7 @@ export class StateService {
   state$: BehaviorSubject<State> = new BehaviorSubject<State>(State.login);
   token: string;
   domains: AppDomains[];
-  loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   numberOfDays: BehaviorSubject<number> = new BehaviorSubject<number>(13);
 
   constructor() {}

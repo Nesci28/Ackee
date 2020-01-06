@@ -48,6 +48,7 @@
       ><button
         [ngClass]="{ active: getRoute() === State.settings }"
         class="header__button link"
+        (click)="setRoute(State.settings)"
       >
         Settings
       </button>
