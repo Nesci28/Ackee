@@ -1,5 +1,9 @@
 @import "../../variables";
 
+input {
+  background-color: lighten($dark, 10%);
+}
+
 .btn {
   padding: 1rem 1.5rem;
   color: $light;
@@ -11,7 +15,13 @@
   }
 
   &-sign-in {
-    min-width: calc(100% - 184px);
-    text-align: right;
+    &-large {
+      min-width: calc(100% - 184px);
+      text-align: right;
+    }
+    &-small {
+      min-width: calc(100% - 92px);
+      text-align: right;
+    }
   }
 }

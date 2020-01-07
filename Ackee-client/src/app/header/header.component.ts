@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { StateService } from "../services/state.service";
-import { State } from "../models/state.enum";
+import { State } from "../models/app.enum";
 
 @Component({
   selector: "app-header",

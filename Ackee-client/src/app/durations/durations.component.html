@@ -1,14 +1,17 @@
 <div>
-  <form [formGroup]="form" class="w-100 d-flex justify-content-between mb-3">
-    <input
-      (change)="inputChanged()"
-      type="number"
-      formControlName="numberOfDays"
-    />
-    <select (change)="selectChanged()" formControlName="durations">
-      <option value="1" selected>Average durations</option>
-      <option value="2">Detailed durations</option>
-    </select>
+  <form [formGroup]="form" class="mb-3">
+    <div class="w-100 d-flex justify-content-between mb-1">
+      <input
+        (change)="inputChanged()"
+        type="number"
+        formControlName="numberOfDays"
+      />
+      <select (change)="selectChanged()" formControlName="durations">
+        <option value="1" selected>Average durations</option>
+        <option value="2">Detailed durations</option>
+      </select>
+    </div>
+    <app-date-picker-range></app-date-picker-range>
   </form>
   <div>
     <div class="card" *ngIf="durations.value !== '2'">

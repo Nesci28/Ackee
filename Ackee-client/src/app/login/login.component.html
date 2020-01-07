@@ -7,6 +7,9 @@
           Welcome back, sign in to continue.
         </h6>
       </div>
+      <div *ngIf="showError" class="bg-error p-2 mb-3">
+        <p class="text-white text-center">Username or password incorrect</p>
+      </div>
       <form [formGroup]="form" (ngSubmit)="login()" id="ngForm">
         <input
           class="d-block w-100 mb-3"

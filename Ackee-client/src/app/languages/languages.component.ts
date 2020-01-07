@@ -1,15 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from "@angular/core";
+import { StateService } from "../services/state.service";
 
 @Component({
-  selector: 'app-languages',
-  templateUrl: './languages.component.html',
-  styleUrls: ['./languages.component.scss']
+  selector: "app-languages",
+  templateUrl: "./languages.component.html",
+  styleUrls: ["./languages.component.scss"]
 })
-export class LanguagesComponent implements OnInit {
+export class LanguagesComponent implements OnInit, AfterViewInit {
+  constructor(private stateService: StateService) {}
 
-  constructor() { }
+  ngOnInit() {}
 
-  ngOnInit() {
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.stateService.loading$.next(false);
+    });
   }
-
 }

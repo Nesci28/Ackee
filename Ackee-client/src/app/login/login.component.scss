@@ -1,5 +1,9 @@
 @import "../../variables";
 
+input {
+  background-color: lighten($dark, 10%);
+}
+
 .card {
   max-width: 420px;
   width: 100%;

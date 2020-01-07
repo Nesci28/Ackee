@@ -1,0 +1,4 @@
+- [x] Date range selector
+- [ ] Add oses graphs (pie charts - only by domain (no main))
+- [ ] Add platform graphs (pie charts - only by domain (no main))
+- [ ] Click on the name of a graphs to excahgen position with the main one

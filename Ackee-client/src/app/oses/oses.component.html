@@ -1,0 +1,32 @@
+<div>
+  <div>
+    <div class="row">
+      <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
+        <div class="spacer"></div>
+        <div class="card">
+          <div class="card-body">
+            <h3 class="text-left">
+              {{ domain.title }}
+            </h3>
+            <app-loading-in-card
+              [type]="'sub'"
+              *ngIf="getLoading()"
+            ></app-loading-in-card>
+            <div *ngIf="chartData[i][0].data.length === 0">
+              <i class="fas fa-exclamation-circle fa-4x"></i>
+            </div>
+            <canvas
+              *ngIf="!getLoading() && chartData[i][0].data.length > 0"
+              baseChart
+              [chartType]="'pie'"
+              [datasets]="chartData[i]"
+              [labels]="chartLabels[i]"
+              [legend]="false"
+            >
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

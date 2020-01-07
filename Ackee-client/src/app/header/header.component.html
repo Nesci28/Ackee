@@ -28,12 +28,6 @@
       >
         Pages</button
       ><button
-        [ngClass]="{ active: getRoute() === State.referrers }"
-        class="header__button link"
-        (click)="setRoute(State.referrers)"
-      >
-        Referrers</button
-      ><button
         [ngClass]="{ active: getRoute() === State.durations }"
         class="header__button link"
         (click)="setRoute(State.durations)"
@@ -46,6 +40,20 @@
       >
         Languages</button
       ><button
+        [ngClass]="{ active: getRoute() === State.oses }"
+        class="header__button link"
+        (click)="setRoute(State.oses)"
+      >
+        OSes
+      </button>
+      <button
+        [ngClass]="{ active: getRoute() === State.platforms }"
+        class="header__button link"
+        (click)="setRoute(State.platforms)"
+      >
+        Platforms
+      </button>
+      <button
         [ngClass]="{ active: getRoute() === State.settings }"
         class="header__button link"
         (click)="setRoute(State.settings)"

@@ -13,12 +13,14 @@ import { HttpConfigInterceptor } from "./interceptors/http.interceptor";
 import { LoginComponent } from "./login/login.component";
 import { BaseComponent } from "./shared/base/base.component";
 import { ViewsComponent } from "./views/views.component";
-import { PagesComponent } from './pages/pages.component';
-import { ReferrersComponent } from './referrers/referrers.component';
-import { DurationsComponent } from './durations/durations.component';
-import { LanguagesComponent } from './languages/languages.component';
-import { LoadingInCardComponent } from './shared/loading-in-card/loading-in-card.component';
-import { SettingsComponent } from './settings/settings.component';
+import { PagesComponent } from "./pages/pages.component";
+import { OsesComponent } from "./oses/oses.component";
+import { DurationsComponent } from "./durations/durations.component";
+import { LanguagesComponent } from "./languages/languages.component";
+import { LoadingInCardComponent } from "./shared/loading-in-card/loading-in-card.component";
+import { SettingsComponent } from "./settings/settings.component";
+import { DatePickerRangeComponent } from "./shared/date-picker-range/date-picker-range.component";
+import { PlatformsComponent } from './platforms/platforms.component';
 
 @NgModule({
   declarations: [
@@ -28,11 +30,13 @@ import { SettingsComponent } from './settings/settings.component';
     BaseComponent,
     ViewsComponent,
     PagesComponent,
-    ReferrersComponent,
+    OsesComponent,
     DurationsComponent,
     LanguagesComponent,
     LoadingInCardComponent,
-    SettingsComponent
+    SettingsComponent,
+    DatePickerRangeComponent,
+    PlatformsComponent
   ],
   imports: [
     NgbModule,

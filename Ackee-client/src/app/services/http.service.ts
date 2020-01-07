@@ -35,8 +35,30 @@ export class HttpService {
     });
   }
 
+  addDomain(title: string): Observable<any> {
+    return this.httpClient.post<any>(`${environment.url}/domains`, { title });
+  }
+
   deleteDomain(domain: string): Observable<any> {
     return this.httpClient.delete<any>(`${environment.url}/domains/${domain}`);
+  }
+
+  async getOses(domains: AppDomains[]): Promise<any> {
+    const res: any = { type: "", data: [] };
+    await Promise.all(
+      domains.map(async domain => {
+        const data: any = await this.httpClient
+          .get<Views>(`${environment.url}/domains/${domain.id}/oses`)
+          .toPromise();
+        res.type = data.type;
+        const subArr = { id: domain.id, data: [] };
+        data.data.forEach((e: any) => {
+          subArr.data.push(e);
+        });
+        res.data.push(subArr);
+      })
+    );
+    return res;
   }
 
   async getViews(type: string, domains: AppDomains[]): Promise<Views> {

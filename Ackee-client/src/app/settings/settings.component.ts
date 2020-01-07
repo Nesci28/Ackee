@@ -5,7 +5,7 @@ import { takeUntil } from "rxjs/operators";
 
 import { environment } from "../../environments/environment";
 import { AppDomains } from "../models/app.model";
-import { Modal } from "../models/state.enum";
+import { Modal } from "../models/app.enum";
 import { HttpService } from "../services/http.service";
 import { StateService } from "../services/state.service";
 import { BaseComponent } from "../shared/base/base.component";
@@ -63,18 +63,22 @@ export class SettingsComponent extends BaseComponent implements OnInit {
     return this.modalForm.get("code");
   }
 
-  open(content: any, domain: AppDomains) {
-    const url = environment.url;
-    this.title.setValue(domain.title);
-    this.id.setValue(domain.id);
-    this.code.setValue(
-      `<script async src="${url}/${this.trackerName.value.replace(
-        "Tracker Name: ",
-        ""
-      )}.js" data-ackee-server="${url}" data-ackee-domain-id="${
-        domain.id
-      }"></script>`
-    );
+  open(content: any, domain?: AppDomains) {
+    if (domain) {
+      const url = environment.url;
+      this.title.setValue(domain.title);
+      this.id.setValue(domain.id);
+      this.code.setValue(
+        `<script async src="${url}/${this.trackerName.value.replace(
+          "Tracker Name: ",
+          ""
+        )}.js" data-ackee-server="${url}" data-ackee-domain-id="${
+          domain.id
+        }"></script>`
+      );
+    } else {
+      this.title.setValue("");
+    }
     this.modalService
       .open(content, { windowClass: "dark-modal", centered: true })
       .result.then(
@@ -102,6 +106,16 @@ export class SettingsComponent extends BaseComponent implements OnInit {
                 el.title = this.title.value;
                 this.domains = this.stateService.domains;
               }
+            });
+            this.stateService.loading$.next(false);
+          } else if (result === Modal.add) {
+            this.stateService.loading$.next(true);
+            const newDomain = await this.httpService
+              .addDomain(this.title.value)
+              .toPromise();
+            this.stateService.domains.push({
+              id: newDomain.data.id,
+              title: newDomain.data.title
             });
             this.stateService.loading$.next(false);
           }

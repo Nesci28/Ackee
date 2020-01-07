@@ -35,3 +35,14 @@ export interface Views {
   type: string;
   data: ViewsData[];
 }
+
+export interface OsesData {
+  id: { osName: string };
+  count: number;
+  created: string[];
+}
+
+export interface Oses {
+  type: string;
+  data: OsesData[];
+}

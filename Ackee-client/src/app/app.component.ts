@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
-import { State } from "./models/state.enum";
+import { State } from "./models/app.enum";
 import { StateService } from "./services/state.service";
 import { BaseComponent } from "./shared/base/base.component";
 
