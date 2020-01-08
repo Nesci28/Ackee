@@ -1,23 +1,30 @@
 <div>
   <form [formGroup]="form" class="mb-3">
-    <div class="w-100 d-flex justify-content-between mb-1">
+    <div class="w-100 d-flex-responsive justify-content-between mb-1">
       <input
         (change)="inputChanged()"
         type="number"
         formControlName="numberOfDays"
+        class="mr-3 btn-reponsive btn-reponsive-mb-2"
       />
-      <select (change)="selectChanged()" formControlName="views">
+      <select
+        (change)="selectChanged()"
+        formControlName="views"
+        class="btn-reponsive btn-reponsive-mb-3"
+      >
         <option value="1" selected>Unique site views</option>
         <option value="2">Total page views</option>
       </select>
     </div>
+    <!-- TODO: Fix CSS -->
     <app-date-picker-range></app-date-picker-range>
   </form>
   <div>
     <div class="card">
       <div class="card-body">
         <h3 class="text-left">
-          {{ views.value === "1" ? "Site views" : "Page views" }}
+          {{ views.value === "1" ? "Site views" : "Page views" }} -
+          {{ chartTitleName[0] }}
         </h3>
         <app-loading-in-card
           [type]="'main'"
@@ -40,7 +47,12 @@
         <div class="spacer"></div>
         <div class="card">
           <div class="card-body">
-            <h3 class="text-left">{{ domain.title }}</h3>
+            <h3
+              class="text-left pointer text-primary-hover"
+              (click)="moveToMain(i)"
+            >
+              {{ chartTitleName[i + 1] }}
+            </h3>
             <app-loading-in-card
               [type]="'sub'"
               *ngIf="getLoading()"

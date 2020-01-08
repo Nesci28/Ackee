@@ -1,1 +1,44 @@
-<p>languages works!</p>
+<div>
+  <div class="row">
+    <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
+      <div *ngIf="showSpacer(i)" class="spacer"></div>
+      <div class="card">
+        <div class="card-body" style="height: 420px; max-height: 420px;">
+          <h3 class="text-left">
+            {{ domain.title }}
+          </h3>
+          <div *ngIf="getLoading()">
+            <app-loading-in-card [type]="'sub'"></app-loading-in-card>
+          </div>
+          <div *ngIf="!getLoading()">
+            <div
+              *ngIf="getlanguagesByDomain(domain.id).data.length === 0"
+              class="d-flex justify-content-center align-items-center"
+              style="height: calc(420px - 40px - 33px - 8px);"
+            >
+              <i class="fas fa-exclamation-circle fa-10x icon"></i>
+            </div>
+            <div *ngIf="getlanguagesByDomain(domain.id).data.length > 0">
+              <div
+                *ngFor="
+                  let lang of getlanguagesByDomain(domain.id).data;
+                  let last = last
+                "
+                class="mt-1"
+              >
+                <div [ngClass]="{ 'border-bottom border-secondary': !last }">
+                  <span class="badge badge-dark lead text-primary mb-1"
+                    >{{ lang.count }}x</span
+                  >
+                  <span class="ml-2 text-secondary">{{
+                    getLangFromjson(lang.name)
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

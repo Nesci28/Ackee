@@ -1,19 +1,22 @@
 <div>
-  <div>
-    <div class="row">
-      <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
-        <div class="spacer"></div>
-        <div class="card">
-          <div class="card-body">
-            <h3 class="text-left">
-              {{ domain.title }}
-            </h3>
-            <app-loading-in-card
-              [type]="'sub'"
-              *ngIf="getLoading()"
-            ></app-loading-in-card>
-            <div *ngIf="chartData[i][0].data.length === 0">
-              <i class="fas fa-exclamation-circle fa-4x"></i>
+  <div class="row">
+    <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
+      <div *ngIf="showSpacer(i)" class="spacer"></div>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="text-left">
+            {{ domain.title }}
+          </h3>
+          <div *ngIf="getLoading()" [style.height]="getHeight()">
+            <app-loading-in-card [type]="'sub'"></app-loading-in-card>
+          </div>
+          <div *ngIf="!getLoading()">
+            <div
+              *ngIf="chartData[i][0]?.data.length === 0"
+              class="d-flex justify-content-center align-items-center"
+              [style.height]="getHeight()"
+            >
+              <i class="fas fa-exclamation-circle fa-10x icon"></i>
             </div>
             <canvas
               *ngIf="!getLoading() && chartData[i][0].data.length > 0"
@@ -21,7 +24,7 @@
               [chartType]="'pie'"
               [datasets]="chartData[i]"
               [labels]="chartLabels[i]"
-              [legend]="false"
+              [legend]="true"
             >
             </canvas>
           </div>

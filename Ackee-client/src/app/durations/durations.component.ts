@@ -24,6 +24,7 @@ export class DurationsComponent extends BaseComponent implements OnInit {
   });
 
   data: Views = { type: "", data: [] };
+  chartTitleName: string[] = [];
 
   dataArrAll: any[] = [];
   chartLabels: string[] = [];
@@ -59,6 +60,10 @@ export class DurationsComponent extends BaseComponent implements OnInit {
 
     this.stateService.loading$.next(true);
     this.domains = this.stateService.domains;
+    this.chartTitleName = ["General"];
+    this.domains.forEach(domain => {
+      this.chartTitleName.push(domain.title);
+    });
     this.durations.setValue("1");
 
     // Getting the labels
@@ -141,5 +146,14 @@ export class DurationsComponent extends BaseComponent implements OnInit {
 
   getLoading(): boolean {
     return this.stateService.loading$.value;
+  }
+
+  moveToMain(index: number): void {
+    const originalMain = this.chartData[0];
+    const originalTitle = this.chartTitleName[0];
+    this.chartData[0] = this.chartData[index + 1];
+    this.chartData[index + 1] = originalMain;
+    this.chartTitleName[0] = this.chartTitleName[index + 1];
+    this.chartTitleName[index + 1] = originalTitle;
   }
 }

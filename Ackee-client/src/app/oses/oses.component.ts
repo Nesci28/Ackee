@@ -4,7 +4,7 @@ import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
 import { Charts } from "../models/app.enum";
 import { AppDomains } from "../models/app.model";
-import { Oses, OsesData } from "../models/backend.model";
+import { Oses } from "../models/backend.model";
 import { ChartsService } from "../services/charts.service";
 import { HttpService } from "../services/http.service";
 import { StateService } from "../services/state.service";
@@ -41,6 +41,7 @@ export class OsesComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.domains = this.stateService.domains;
     this.stateService.start$.next(true);
 
     this.stateService.start$
@@ -49,17 +50,7 @@ export class OsesComponent extends BaseComponent implements OnInit {
         this.start = start;
       });
 
-    // this.stateService.numberOfDays$
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe((numberOfDays: number) => {
-    //     this.numberOfDays.setValue(numberOfDays);
-    //     if (!this.start) {
-    //       this.inputChanged(true);
-    //     }
-    //   });
-
     this.stateService.loading$.next(true);
-    this.domains = this.stateService.domains;
     // this.views.setValue("1");
 
     // Fetching the Data
@@ -82,7 +73,6 @@ export class OsesComponent extends BaseComponent implements OnInit {
       // Configuring the Chart
       this.chartData[i] = chartsObj.chartData[0];
       this.chartOptions[i] = chartsObj.chartOptions[0];
-      console.log("this.chartData[i] :", this.chartData[i]);
     });
 
     this.stateService.loading$.next(false);
@@ -90,5 +80,22 @@ export class OsesComponent extends BaseComponent implements OnInit {
 
   getLoading(): boolean {
     return this.stateService.loading$.value;
+  }
+
+  getHeight(): string {
+    let res: number;
+    if (window.innerWidth < 576)
+      res = Math.round(((window.innerWidth - 73) * 250) / 501);
+    if (window.innerWidth > 575) res = 233;
+    if (window.innerWidth > 767) res = 323;
+    if (window.innerWidth > 991) res = 203;
+    if (window.innerWidth > 1199) res = 248;
+    return `${res}px`;
+  }
+
+  showSpacer(index: number): boolean {
+    if (window.innerWidth > 991 && index > 1) return true;
+    if (window.innerWidth <= 991 && index > 0) return true;
+    return false;
   }
 }

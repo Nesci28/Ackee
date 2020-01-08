@@ -30,6 +30,22 @@ export class LoginComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (localStorage.getItem("token")) {
+      this.httpService
+        .getDomains()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((domains: Domains) => {
+          const resDomains: AppDomains[] = [];
+          domains.data.forEach(domain => {
+            resDomains.push({
+              id: domain.data.id,
+              title: domain.data.title
+            });
+          });
+          this.stateService.domains = resDomains;
+          this.stateService.state$.next(State.views);
+        });
+    }
     if (isDevMode()) {
       this.username.setValue("test");
       this.password.setValue("root");
@@ -54,6 +70,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
         .subscribe(
           (token: Token) => {
             this.stateService.token = token.data.id;
+            localStorage.setItem("token", token.data.id);
             this.httpService
               .getDomains()
               .pipe(takeUntil(this.destroy$))

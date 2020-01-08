@@ -4,6 +4,7 @@ import { AppDomains } from "../models/app.model";
 import { StateService } from "./state.service";
 import { NgbDate } from "@ng-bootstrap/ng-bootstrap";
 import { Charts } from "../models/app.enum";
+import { OsesData } from "../models/backend.model";
 
 @Injectable({
   providedIn: "root"
@@ -24,8 +25,9 @@ export class ChartsService {
         );
       }
     } else if (type === Charts.pie) {
-      data.data.forEach(el => {
-        arr.push(el.id.osName);
+      data.data.forEach((el: any) => {
+        if (el.id) arr.push(el.id.osName);
+        else if (+Object.values(el) > 0) arr.push(Object.keys(el));
       });
     }
     return arr;
@@ -129,15 +131,35 @@ export class ChartsService {
         }
       });
     } else if (type === Charts.pie) {
-      const dataArr = datas.data.map(x => x.count);
+      let dataArr = datas.data.map((x: any) => x.count);
+      if (dataArr[0] === undefined) {
+        dataArr = datas.data.map((x: any) => Object.values(x));
+        dataArr = dataArr.filter((x: any) => x[0] !== 0);
+      }
+      const colorArr = [];
+      let counter = 0;
+      for (let i = 0; i < dataArr.length; i++) {
+        if (counter === 0) colorArr.push("#9AB0A6");
+        if (counter === 1) colorArr.push("#A4E5FF");
+        if (counter === 2) colorArr.push("#374B42");
+        if (counter === 3) {
+          colorArr.push("#66AEFF");
+          counter = -1;
+        }
+        counter++;
+      }
       chartData.push([
         {
           data: dataArr,
-          backgroundColor: "#6e7373",
+          backgroundColor: colorArr,
           hoverBackgroundColor: "#73fac8",
           hoverBorderColor: "#73fac8"
         }
       ]);
+
+      chartOptions.push({
+        responsive: true
+      });
     }
     return {
       chartData,

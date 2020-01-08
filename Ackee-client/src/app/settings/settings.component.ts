@@ -5,7 +5,7 @@ import { takeUntil } from "rxjs/operators";
 
 import { environment } from "../../environments/environment";
 import { AppDomains } from "../models/app.model";
-import { Modal } from "../models/app.enum";
+import { Modal, State } from "../models/app.enum";
 import { HttpService } from "../services/http.service";
 import { StateService } from "../services/state.service";
 import { BaseComponent } from "../shared/base/base.component";
@@ -134,5 +134,10 @@ export class SettingsComponent extends BaseComponent implements OnInit {
     } else {
       return `with: ${reason}`;
     }
+  }
+
+  logOut(): void {
+    localStorage.removeItem("token");
+    this.stateService.state$.next(State.login);
   }
 }

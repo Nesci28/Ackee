@@ -77,6 +77,47 @@ textarea {
   min-height: 100px;
 }
 
+.d-flex-responsive {
+  @media screen and (min-width: 450px) {
+    display: flex;
+  }
+  @media screen and (max-width: 451px) {
+    display: block;
+  }
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.text-primary {
+  color: $primary !important;
+
+  &-hover:hover {
+    color: $primary;
+  }
+}
+
+.badge {
+  padding-right: 1rem;
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 100px;
+  font-size: 100%;
+
+  &-dark {
+    background-color: rgba(110, 115, 115, 0.5);
+  }
+}
+
+.icon {
+  color: #6e7373;
+  &:hover {
+    color: $primary;
+  }
+}
+
 .bg {
   &-error {
     border-radius: 6px;
@@ -136,6 +177,26 @@ textarea {
   &-link:focus {
     text-decoration: none;
     color: $white;
+  }
+
+  &-reponsive {
+    width: 190px;
+
+    @media screen and (max-width: 451px) {
+      width: 100%;
+    }
+    &-mb {
+      &-2 {
+        @media screen and (max-width: 451px) {
+          margin-bottom: 0.5rem;
+        }
+      }
+      &-3 {
+        @media screen and (max-width: 451px) {
+          margin-bottom: 1rem;
+        }
+      }
+    }
   }
 }
 

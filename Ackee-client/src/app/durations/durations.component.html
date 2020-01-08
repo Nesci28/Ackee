@@ -17,7 +17,8 @@
     <div class="card" *ngIf="durations.value !== '2'">
       <div class="card-body">
         <h3 class="text-left">
-          {{ durations.value === "1" ? "Average Durations" : "EasterEgg" }}
+          {{ durations.value === "1" ? "Average Durations" : "EasterEgg" }} -
+          {{ chartTitleName[0] }}
         </h3>
         <app-loading-in-card
           [type]="'main'"
@@ -40,7 +41,12 @@
         <div class="spacer"></div>
         <div class="card">
           <div class="card-body">
-            <h3 class="text-left">{{ domain.title }}</h3>
+            <h3
+              class="text-left pointer text-primary-hover"
+              (click)="moveToMain(i)"
+            >
+              {{ chartTitleName[i + 1] }}
+            </h3>
             <app-loading-in-card
               [type]="'sub'"
               *ngIf="getLoading()"
