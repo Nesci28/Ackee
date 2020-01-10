@@ -1,0 +1,46 @@
+<div>
+  <form [formGroup]="form" class="mb-3">
+    <div class="w-100 d-flex-responsive mb-1">
+      <input
+        (change)="inputChanged()"
+        type="number"
+        formControlName="numberOfDays"
+        class="mr-2 btn-reponsive btn-reponsive-mb-2"
+      />
+      <div
+        class="btn-group btn-group-toggle btn-reponsive-mb-3"
+        ngbRadioGroup
+        name="radioBasic"
+        formControlName="radioChoice"
+        (change)="radioChoiceChanged()"
+      >
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="selected" />Selected Dates
+        </label>
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="all" />All Time
+        </label>
+      </div>
+    </div>
+    <app-date-picker-range></app-date-picker-range>
+  </form>
+
+  <div class="row">
+    <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
+      <div *ngIf="showSpacer(i)" class="spacer"></div>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="text-left">
+            {{ domain.title }}
+          </h3>
+          <app-graph-pie
+            [domain]="domain"
+            [chartData]="chartData[i]"
+            [chartLabels]="chartLabels[i]"
+            [chartOptions]="chartOptions[i]"
+          ></app-graph-pie>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+@import "../../../variables";
+
+input {
+  background-color: lighten($dark, 10%);
+}
+
+.btn {
+  padding: 1rem 1.5rem;
+  color: $light;
+
+  &-help {
+    min-width: 92px;
+    max-width: 92px;
+    border-right: 1px solid $black;
+  }
+
+  &-sign-in {
+    &-large {
+      min-width: calc(100% - 184px);
+      text-align: right;
+    }
+    &-small {
+      min-width: calc(100% - 92px);
+      text-align: right;
+    }
+  }
+}

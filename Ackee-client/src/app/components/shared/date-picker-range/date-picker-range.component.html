@@ -1,0 +1,76 @@
+<form [formGroup]="form" class="form-inline">
+  <div class="form-group hidden">
+    <div class="input-group">
+      <input
+        name="datepicker"
+        ngbDatepicker
+        #datepicker="ngbDatepicker"
+        [autoClose]="'outside'"
+        (dateSelect)="onDateSelection($event)"
+        [displayMonths]="2"
+        [dayTemplate]="t"
+        outsideDays="hidden"
+        [startDate]="fromDate"
+        class="responsive-height"
+      />
+      <ng-template #t let-date let-focused="focused">
+        <span
+          class="custom-day"
+          [class.focused]="focused"
+          [class.range]="isRange(date)"
+          [class.faded]="isHovered(date) || isInside(date)"
+          (mouseenter)="hoveredDate = date"
+          (mouseleave)="hoveredDate = null"
+        >
+          {{ date.day }}
+        </span>
+      </ng-template>
+    </div>
+  </div>
+  <div class="responsive-flex">
+    <div class="form-group">
+      <div class="input-group">
+        <input
+          [disabled]="disabled"
+          class="responsive-width"
+          #dpFromDate
+          name="dpFromDate"
+          [value]="disabled ? '' : formatter.format(fromDate)"
+          (input)="
+            setDate('fromDate', validateInput(fromDate, dpFromDate.value))
+          "
+        />
+        <div class="input-group-append">
+          <button
+            [disabled]="disabled"
+            [ngClass]="{ 'pointer-danger': disabled }"
+            class="btn btn-outline-secondary calendar"
+            (click)="datepicker.toggle()"
+            type="button"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div class="form-group responsive-ml">
+      <div class="input-group">
+        <input
+          [disabled]="disabled"
+          class="responsive-width"
+          #dpToDate
+          name="dpToDate"
+          [value]="disabled ? '' : formatter.format(toDate)"
+          (input)="setDate('toDate', validateInput(fromDate, dpFromDate.value))"
+        />
+        <div class="input-group-append">
+          <button
+            [disabled]="disabled"
+            [ngClass]="{ 'pointer-danger': disabled }"
+            class="btn btn-outline-secondary calendar"
+            (click)="datepicker.toggle()"
+            type="button"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

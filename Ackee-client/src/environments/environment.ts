@@ -4,7 +4,9 @@
 
 export const environment = {
   production: false,
-  url: "https://ackee-server.now.sh"
+  url: "https://ackee-server.now.sh",
+  username: "test",
+  password: "root"
 };
 
 /*

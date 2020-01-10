@@ -18,6 +18,21 @@ body {
   margin: 0;
 }
 
+ngb-datepicker {
+  @media screen and (max-width: 492px) {
+    transform: scale(0.85) translate(-42px, 12px) !important;
+  }
+  @media screen and (max-width: 452px) {
+    transform: scale(0.75) translate(-79px, 29px) !important;
+  }
+  @media screen and (max-width: 388px) {
+    transform: scale(0.7) translate(-101px, 21px) !important;
+  }
+  @media screen and (max-width: 364px) {
+    transform: scale(0.65) translate(-127px, 11px) !important;
+  }
+}
+
 textarea:focus,
 input:focus,
 select:focus {
@@ -77,6 +92,12 @@ textarea {
   min-height: 100px;
 }
 
+.btn-group {
+  @media screen and (max-width: 451px) {
+    width: 100%;
+  }
+}
+
 .d-flex-responsive {
   @media screen and (min-width: 450px) {
     display: flex;
@@ -88,6 +109,10 @@ textarea {
 
 .pointer {
   cursor: pointer;
+
+  &-danger {
+    cursor: not-allowed;
+  }
 }
 
 .text-primary {
@@ -178,7 +203,11 @@ textarea {
     text-decoration: none;
     color: $white;
   }
-
+  &-outline {
+    &-secondary {
+      background-color: #333838;
+    }
+  }
   &-reponsive {
     width: 190px;
 

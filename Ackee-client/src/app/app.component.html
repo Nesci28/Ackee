@@ -5,12 +5,29 @@
     [ngClass]="{ 'px-3': state !== State.login, 'py-5': state !== State.login }"
     class="container"
   >
-    <app-views *ngIf="state === State.views"></app-views>
-    <app-pages *ngIf="state === State.pages"></app-pages>
-    <app-durations *ngIf="state === State.durations"></app-durations>
-    <app-languages *ngIf="state === State.languages"></app-languages>
-    <app-oses *ngIf="state === State.oses"></app-oses>
-    <app-platforms *ngIf="state === State.platforms"></app-platforms>
+    <!-- Bars -->
+    <app-views-or-durations
+      *ngIf="state === State.views"
+    ></app-views-or-durations>
+    <app-views-or-durations
+      *ngIf="state === State.durations"
+    ></app-views-or-durations>
+
+    <!-- Pies -->
+    <app-oses-or-platforms *ngIf="state === State.oses"></app-oses-or-platforms>
+    <app-oses-or-platforms
+      *ngIf="state === State.platforms"
+    ></app-oses-or-platforms>
+
+    <!-- Tables -->
+    <app-pages-or-languages
+      *ngIf="state === State.pages"
+    ></app-pages-or-languages>
+    <app-pages-or-languages
+      *ngIf="state === State.languages"
+    ></app-pages-or-languages>
+
+    <!-- Other -->
     <app-settings *ngIf="state === State.settings"></app-settings>
   </div>
 </div>

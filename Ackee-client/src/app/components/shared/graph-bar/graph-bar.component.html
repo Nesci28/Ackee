@@ -1,0 +1,17 @@
+<div>
+  <div *ngIf="loading">
+    <app-loading-in-card [type]="loadingType"></app-loading-in-card>
+  </div>
+  <div *ngIf="!loading && chartData">
+    <canvas
+      *ngIf="chartData[0].data.length > 0"
+      baseChart
+      [chartType]="'bar'"
+      [datasets]="chartData"
+      [labels]="chartLabels"
+      [options]="chartOptions"
+      [legend]="false"
+    >
+    </canvas>
+  </div>
+</div>

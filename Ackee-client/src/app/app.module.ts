@@ -8,19 +8,21 @@ import { ChartsModule } from "ng2-charts";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { HeaderComponent } from "./header/header.component";
-import { HttpConfigInterceptor } from "./interceptors/http.interceptor";
-import { LoginComponent } from "./login/login.component";
-import { BaseComponent } from "./shared/base/base.component";
-import { ViewsComponent } from "./views/views.component";
-import { PagesComponent } from "./pages/pages.component";
-import { OsesComponent } from "./oses/oses.component";
-import { DurationsComponent } from "./durations/durations.component";
-import { LanguagesComponent } from "./languages/languages.component";
-import { LoadingInCardComponent } from "./shared/loading-in-card/loading-in-card.component";
-import { SettingsComponent } from "./settings/settings.component";
-import { DatePickerRangeComponent } from "./shared/date-picker-range/date-picker-range.component";
-import { PlatformsComponent } from './platforms/platforms.component';
+import { HeaderComponent } from "./components/header/header.component";
+import { HttpConfigInterceptor } from "./constants/http.interceptor";
+import { LoginComponent } from "./components/login/login.component";
+import { BaseComponent } from "./components/shared/base/base.component";
+import { ViewsOrDurationsComponent } from "./components/views-or-durations/views-or-durations.component";
+import { PagesOrLanguagesComponent } from "./components/pages-or-languages/pages-or-languages.component";
+import { OsesOrPlatformsComponent } from "./components/oses-or-platforms/oses-or-platforms.component";
+import { LoadingInCardComponent } from "./components/shared/loading-in-card/loading-in-card.component";
+import { SettingsComponent } from "./components/settings/settings.component";
+import { DatePickerRangeComponent } from "./components/shared/date-picker-range/date-picker-range.component";
+import { GraphBarComponent } from "./components/shared/graph-bar/graph-bar.component";
+import { GraphPieComponent } from "./components/shared/graph-pie/graph-pie.component";
+import { GraphTableComponent } from "./components/shared/graph-table/graph-table.component";
+import { GraphBubbleComponent } from "./components/shared/graph-bubble/graph-bubble.component";
+import { AppDatePickerComponent } from "./components/shared/app-date-picker/app-date-picker.component";
 
 @NgModule({
   declarations: [
@@ -28,15 +30,17 @@ import { PlatformsComponent } from './platforms/platforms.component';
     HeaderComponent,
     LoginComponent,
     BaseComponent,
-    ViewsComponent,
-    PagesComponent,
-    OsesComponent,
-    DurationsComponent,
-    LanguagesComponent,
+    ViewsOrDurationsComponent,
+    PagesOrLanguagesComponent,
+    OsesOrPlatformsComponent,
     LoadingInCardComponent,
     SettingsComponent,
     DatePickerRangeComponent,
-    PlatformsComponent
+    GraphBarComponent,
+    GraphPieComponent,
+    GraphTableComponent,
+    GraphBubbleComponent,
+    AppDatePickerComponent
   ],
   imports: [
     NgbModule,

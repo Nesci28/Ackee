@@ -3,7 +3,7 @@ import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
 import { State } from "./models/app.enum";
 import { StateService } from "./services/state.service";
-import { BaseComponent } from "./shared/base/base.component";
+import { BaseComponent } from "./components/shared/base/base.component";
 
 @Component({
   selector: "app-root",

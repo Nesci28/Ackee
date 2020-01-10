@@ -5,6 +5,9 @@ import { environment } from "src/environments/environment";
 import { AppDomains } from "../models/app.model";
 import { View, Views } from "../models/backend.model";
 import { Observable } from "rxjs/internal/Observable";
+import { State } from "../models/app.enum";
+
+import { languageList } from "../../assets/list";
 
 @Injectable({
   providedIn: "root"
@@ -29,7 +32,7 @@ export class HttpService {
     );
   }
 
-  renameDomain(domain: string, title): Observable<any> {
+  renameDomain(domain: string, title: string): Observable<any> {
     return this.httpClient.put<any>(`${environment.url}/domains/${domain}`, {
       title
     });
@@ -43,16 +46,72 @@ export class HttpService {
     return this.httpClient.delete<any>(`${environment.url}/domains/${domain}`);
   }
 
-  async getOses(domains: AppDomains[]): Promise<any> {
+  async getOsesOrPlatforms(domains: AppDomains[], state: string): Promise<any> {
     const res: any = { type: "", data: [] };
     await Promise.all(
       domains.map(async domain => {
         const data: any = await this.httpClient
-          .get<Views>(`${environment.url}/domains/${domain.id}/oses`)
+          .get<Views>(`${environment.url}/domains/${domain.id}/${state}`)
+          .toPromise();
+        res.type = data.type;
+        let subArr: any;
+        if (state === State.oses) {
+          subArr = { id: domain.id, data: [] };
+          data.data.forEach((e: any) => {
+            subArr.data.push(e);
+          });
+        } else if (state === State.platforms) {
+          subArr = {
+            id: domain.id,
+            data: [
+              { id: { platform: "X-Small" }, count: 0, created: [] },
+              { id: { platform: "Small" }, count: 0, created: [] },
+              { id: { platform: "Medium" }, count: 0, created: [] },
+              { id: { platform: "Large" }, count: 0, created: [] },
+              { id: { platform: "X-Large" }, count: 0, created: [] }
+            ]
+          };
+          data.data.forEach((e: any) => {
+            if (e.id.platform >= 1200) {
+              subArr.data[0].count += e.created.length;
+              subArr.data[0].created.push(...e.created);
+            } else if (e.id.platform >= 992) {
+              subArr.data[1].count += e.created.length;
+              subArr.data[1].created.push(...e.created);
+            } else if (e.id.platform >= 768) {
+              subArr.data[2].count += e.created.length;
+              subArr.data[2].created.push(...e.created);
+            } else if (e.id.platform >= 576) {
+              subArr.data[3].count += e.created.length;
+              subArr.data[3].created.push(...e.created);
+            } else if (e.id.platform < 576) {
+              subArr.data[4].count += e.created.length;
+              subArr.data[4].created.push(...e.created);
+            }
+          });
+        }
+        res.data.push(subArr);
+      })
+    );
+    return res;
+  }
+
+  async getPagesOrLanguages(
+    domains: AppDomains[],
+    state: string
+  ): Promise<any> {
+    const res: any = { type: "", data: [] };
+    await Promise.all(
+      domains.map(async domain => {
+        const data: any = await this.httpClient
+          .get<Views>(`${environment.url}/domains/${domain.id}/${state}`)
           .toPromise();
         res.type = data.type;
         const subArr = { id: domain.id, data: [] };
         data.data.forEach((e: any) => {
+          if (state === State.languages) {
+            e.data.id = languageList[e.data.id].nativeName.split(",")[0];
+          }
           subArr.data.push(e);
         });
         res.data.push(subArr);
@@ -61,94 +120,17 @@ export class HttpService {
     return res;
   }
 
-  async getPlatforms(domains: AppDomains[]): Promise<any> {
-    const res: any = { type: "", data: [] };
-    await Promise.all(
-      domains.map(async domain => {
-        const data: any = await this.httpClient
-          .get<Views>(`${environment.url}/domains/${domain.id}/platforms`)
-          .toPromise();
-        res.type = data.type;
-        const subArr = {
-          id: domain.id,
-          data: [{ XL: 0 }, { L: 0 }, { M: 0 }, { S: 0 }, { XS: 0 }]
-        };
-        data.data.forEach((e: any) => {
-          if (e.id.platform >= 1200) subArr.data[0].XL += 1;
-          else if (e.id.platform >= 992) subArr.data[1].L += 1;
-          else if (e.id.platform >= 768) subArr.data[2].M += 1;
-          else if (e.id.platform >= 576) subArr.data[3].S += 1;
-          else if (e.id.platform < 576) subArr.data[4].XS += 1;
-        });
-        res.data.push(subArr);
-      })
-    );
-    return res;
-  }
-
-  async getLanguages(domains: AppDomains[]): Promise<any> {
-    const res: any = { type: "", data: [] };
-    await Promise.all(
-      domains.map(async domain => {
-        const data: any = await this.httpClient
-          .get<Views>(`${environment.url}/domains/${domain.id}/languages`)
-          .toPromise();
-        res.type = data.type;
-        const subArr = { id: domain.id, data: [] };
-        data.data.forEach((e: any) => {
-          subArr.data.push(e);
-        });
-        res.data.push(subArr);
-      })
-    );
-    return res;
-  }
-
-  async getPages(domains: AppDomains[]): Promise<any> {
-    const res: any = { type: "", data: [] };
-    await Promise.all(
-      domains.map(async domain => {
-        const data: any = await this.httpClient
-          .get<Views>(`${environment.url}/domains/${domain.id}/pages`)
-          .toPromise();
-        res.type = data.type;
-        const subArr = { id: domain.id, data: [] };
-        data.data.forEach((e: any) => {
-          subArr.data.push(e);
-        });
-        res.data.push(subArr);
-      })
-    );
-    return res;
-  }
-
-  async getViews(type: string, domains: AppDomains[]): Promise<Views> {
+  async getViewsOrDurations(
+    type: string,
+    state: string,
+    domains: AppDomains[]
+  ): Promise<Views> {
     const res: any = { type: "", data: [] };
     await Promise.all(
       domains.map(async domain => {
         const data: any = await this.httpClient
           .get<Views>(
-            `${environment.url}/domains/${domain.id}/views?type=${type}`
-          )
-          .toPromise();
-        res.type = data.type;
-        const subArr = { id: domain.id, data: [] };
-        data.data.forEach((e: View) => {
-          subArr.data.push(e.data);
-        });
-        res.data.push(subArr);
-      })
-    );
-    return res;
-  }
-
-  async getDurations(type: string, domains: AppDomains[]): Promise<Views> {
-    const res: any = { type: "", data: [] };
-    await Promise.all(
-      domains.map(async domain => {
-        const data: any = await this.httpClient
-          .get<Views>(
-            `${environment.url}/domains/${domain.id}/durations?type=${type}`
+            `${environment.url}/domains/${domain.id}/${state}?type=${type}`
           )
           .toPromise();
         res.type = data.type;

@@ -1,0 +1,68 @@
+<div>
+  <form [formGroup]="form" class="mb-3">
+    <div class="w-100 d-flex-responsive justify-content-between mb-1">
+      <input
+        [ngClass]="{ 'visible-no': !showBar() }"
+        (change)="inputChanged()"
+        type="number"
+        formControlName="numberOfDays"
+        class="mr-3 btn-reponsive btn-reponsive-mb-2"
+      />
+      <select
+        (change)="selectChanged()"
+        formControlName="views"
+        class="btn-reponsive btn-reponsive-mb-3"
+      >
+        <option
+          *ngFor="let option of getOptions(); let i = index"
+          value="{{ i + 1 }}"
+          selected
+          >{{ option }}</option
+        >
+      </select>
+    </div>
+    <app-date-picker-range *ngIf="showBar()"></app-date-picker-range>
+  </form>
+
+  <div class="card" *ngIf="showBar()">
+    <div class="card-body">
+      <h3 class="text-left">
+        {{ getTitle() }} -
+        {{ chartTitleName[0] }}
+      </h3>
+      <app-graph-bar
+        [loadingType]="'main'"
+        [chartData]="chartData[0]"
+        [chartLabels]="chartLabels"
+        [chartOptions]="chartOptions[0]"
+      ></app-graph-bar>
+    </div>
+  </div>
+  <div class="row">
+    <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
+      <div class="spacer"></div>
+      <div class="card">
+        <div class="card-body">
+          <h3
+            class="text-left pointer text-primary-hover"
+            (click)="moveToMain(i)"
+          >
+            {{ chartTitleName[i + 1] }}
+          </h3>
+          <app-graph-bar
+            *ngIf="showBar()"
+            [loadingType]="'sub'"
+            [chartData]="chartData[i + 1]"
+            [chartLabels]="chartLabels"
+            [chartOptions]="chartOptions[i + 1]"
+          ></app-graph-bar>
+          <app-graph-bubble
+            *ngIf="!showBar()"
+            [chartData]="chartData[i]"
+            [chartLabels]="chartLabels"
+          ></app-graph-bubble>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

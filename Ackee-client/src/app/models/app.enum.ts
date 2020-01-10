@@ -18,5 +18,21 @@ export enum Modal {
 
 export enum Charts {
   bar = "bar",
-  pie = "pie"
+  pie = "pie",
+  bubble = "bubble"
+}
+
+export enum ViewsEnum {
+  unique = "unique",
+  total = "total"
+}
+
+export enum DurationsEnum {
+  average = "average",
+  detailed = "detailed"
+}
+
+export enum RadioChoices {
+  selected = "selected",
+  all = "all"
 }
