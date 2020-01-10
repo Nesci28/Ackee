@@ -115,9 +115,6 @@ const getDetailed = async id => {
     {
       $match: {
         domainId: id,
-        created: {
-          $gte: dateWithOffset(-6),
-        },
       },
     },
     projectDuration,
@@ -133,6 +130,7 @@ const getDetailed = async id => {
       },
     },
   ]);
+  console.log('averageEntries :', averageEntries);
 
   // No need to continue when there're no entries
   if (averageEntries.length === 0) return [];
@@ -141,9 +139,6 @@ const getDetailed = async id => {
     {
       $match: {
         domainId: id,
-        created: {
-          $gte: dateWithOffset(-6),
-        },
       },
     },
     projectDuration,
@@ -162,6 +157,7 @@ const getDetailed = async id => {
         count: {
           $sum: 1,
         },
+        created: { $push: '$$ROOT.created' },
       },
     },
     {
@@ -175,7 +171,7 @@ const getDetailed = async id => {
       },
     },
   ]);
-
+  console.log('detailedEntries :', detailedEntries);
   return detailedEntries;
 };
 
