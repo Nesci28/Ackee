@@ -19,6 +19,7 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
   domains: AppDomains[] = [];
   start: boolean = true;
   State = State;
+  Charts = Charts;
 
   form: FormGroup = new FormGroup({
     numberOfDays: new FormControl(13, Validators.required),
@@ -58,7 +59,15 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
       .subscribe((numberOfDays: number) => {
         this.numberOfDays.setValue(numberOfDays);
         if (!this.start) {
-          this.inputChanged(true);
+          this.inputChanged();
+        }
+      });
+
+    this.stateService.singleDate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(_ => {
+        if (this.views.value !== "1") {
+          this.configureChart();
         }
       });
 
@@ -81,10 +90,10 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
     return this.form.get("views");
   }
 
-  async inputChanged(state?: boolean): Promise<void> {
+  async inputChanged(): Promise<void> {
     this.stateService.loading$.next(true);
     this.configureChart();
-    if (!state) {
+    if (this.showBar() === Charts.bar) {
       this.stateService.numberOfDays$.next(this.numberOfDays.value);
       this.stateService.getFromDate();
     }
@@ -95,23 +104,22 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
   async selectChanged(): Promise<void> {
     this.stateService.loading$.next(true);
     await this.getData();
-    if (this.showBar()) {
-      this.configureChart();
-    } else {
-      this.configureChart(Charts.bubble);
-    }
+    this.createChartLabel();
+    this.configureChart();
     this.stateService.loading$.next(false);
   }
 
   async getData(): Promise<void> {
-    const type =
-      this.stateService.state$.value === State.views
-        ? this.views.value === "1"
-          ? ViewsEnum.unique
-          : ViewsEnum.unique
-        : this.views.value === "1"
-        ? DurationsEnum.average
-        : DurationsEnum.detailed;
+    let type: string;
+    if (this.stateService.state$.value === State.views) {
+      if (this.views.value === "1") type = ViewsEnum.unique;
+      if (this.views.value === "2") type = ViewsEnum.total;
+      if (this.views.value === "3") type = ViewsEnum.time;
+    } else if (this.stateService.state$.value === State.durations) {
+      if (this.views.value === "1") type = DurationsEnum.average;
+      if (this.views.value === "2") type = DurationsEnum.detailed;
+    }
+
     this.data = await this.httpService.getViewsOrDurations(
       type,
       this.stateService.state$.value,
@@ -119,33 +127,54 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
     );
   }
 
-  createChartLabel(type?: string): void {
-    if (!type) {
+  createChartLabel(): void {
+    if (this.showBar() === Charts.bar) {
       this.chartLabels = this.chartsService.createChartBarLabel(
         this.numberOfDays.value
       );
     } else {
-      this.chartLabels = this.chartsService.createChartBubbleLabel();
+      this.chartLabels = this.chartsService.createChartBubbleOrLineLabel();
+      console.log("this.chartLabels :", this.chartLabels);
     }
   }
 
-  configureChart(type?: string): void {
+  configureChart(): void {
+    this.chartData = [];
+    this.chartOptions = [];
+
     let chartsObj: any;
-    if (!type) {
+    if (this.showBar() === Charts.bar) {
       chartsObj = this.chartsService.configureChartBar(
         this.data,
         this.stateService.domains,
         this.numberOfDays.value
       );
-    } else {
+      this.chartData = chartsObj.chartData;
+    } else if (this.showBar() === Charts.bubble) {
       chartsObj = this.chartsService.configureChartBubble(
         this.data,
         this.stateService.singleDate$.value
       );
+      const tempChartData = chartsObj.chartData;
+      this.domains.forEach((domain: AppDomains) => {
+        const data = tempChartData.filter(
+          (el: any) => el.domainId === domain.id
+        )[0].data;
+        this.chartData.push(data);
+      });
+    } else if (this.showBar() === Charts.line) {
+      chartsObj = this.chartsService.configureChartLine(
+        this.data,
+        this.stateService.singleDate$.value
+      );
+      this.chartData = chartsObj.chartData;
     }
-    this.chartData = chartsObj.chartData;
-    console.log("this.chartData :", this.chartData);
+
     this.chartOptions = chartsObj.chartOptions;
+  }
+
+  filterChartDataDomain(domainId: string): any {
+    return this.chartData.filter(data => data.domainId === domainId)[0].data;
   }
 
   moveToMain(index: number): void {
@@ -167,17 +196,36 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
 
   getOptions(): string[] {
     if (this.stateService.state$.value === State.views) {
-      return ["Unique site views", "Total page views"];
+      return ["Unique site views", "Total page views", "Visited Times"];
     } else if (this.stateService.state$.value === State.durations) {
       return ["Average durations", "Detailed durations"];
     }
   }
 
-  showBar(): boolean {
-    return (
-      this.stateService.state$.value === State.views ||
+  showBar(): Charts {
+    if (
+      (this.stateService.state$.value === State.views &&
+        this.views.value !== "3") ||
       (this.stateService.state$.value === State.durations &&
         this.views.value === "1")
-    );
+    ) {
+      return Charts.bar;
+    } else if (
+      this.stateService.state$.value === State.durations &&
+      this.views.value === "2"
+    ) {
+      return Charts.bubble;
+    } else {
+      return Charts.line;
+    }
+  }
+
+  showSpacer(index: number): boolean {
+    if (this.views.value !== "2") return true;
+    else if (this.views.value === "2") {
+      if (window.innerWidth > 991 && index > 1) return true;
+      if (window.innerWidth <= 991 && index > 0) return true;
+      return false;
+    }
   }
 }

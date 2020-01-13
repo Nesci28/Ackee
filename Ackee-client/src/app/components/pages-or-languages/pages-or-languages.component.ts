@@ -54,8 +54,8 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
     this.stateService.numberOfDays$
       .pipe(takeUntil(this.destroy$))
       .subscribe((numberOfDays: number) => {
-        this.numberOfDays.setValue(numberOfDays);
         if (!this.start) {
+          this.numberOfDays.setValue(numberOfDays);
           this.inputChanged(true);
         }
       });

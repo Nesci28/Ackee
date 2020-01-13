@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AppDatePickerComponent } from './app-date-picker.component';
+import { GraphLineComponent } from './graph-line.component';
 
-describe('AppDatePickerComponent', () => {
-  let component: AppDatePickerComponent;
-  let fixture: ComponentFixture<AppDatePickerComponent>;
+describe('GraphLineComponent', () => {
+  let component: GraphLineComponent;
+  let fixture: ComponentFixture<GraphLineComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AppDatePickerComponent ]
+      declarations: [ GraphLineComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AppDatePickerComponent);
+    fixture = TestBed.createComponent(GraphLineComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

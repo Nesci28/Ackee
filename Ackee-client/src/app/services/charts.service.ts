@@ -36,7 +36,7 @@ export class ChartsService {
     return arr;
   }
 
-  createChartBubbleLabel(): string[] {
+  createChartBubbleOrLineLabel(): string[] {
     return [
       "00:00",
       "01:00",
@@ -238,11 +238,58 @@ export class ChartsService {
         }
       });
       chartData.push({
-        data: arr,
-        backgroundColor: "#6e7373",
-        hoverBackgroundColor: "#73fac8",
-        hoverBorderColor: "#73fac8"
+        domainId: domainData.id,
+        data: {
+          data: arr,
+          backgroundColor: "#6e7373",
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
       });
+    });
+
+    return {
+      chartData,
+      chartOptions
+    };
+  }
+
+  configureChartLine(data: any, date: NgbDate): any {
+    const tempChartData = [];
+    const chartData = [];
+    const chartOptions = [];
+
+    data.data.forEach((el: any, i: number) => {
+      if (i === 0) {
+        tempChartData[0] = Array(24).fill(0);
+      }
+      const selectedDateData = el.data.filter(
+        (x: any) =>
+          x.id.day === date.day &&
+          x.id.month === date.month &&
+          x.id.year === date.year
+      );
+      if (selectedDateData.length === 0) {
+        tempChartData[i + 1] = Array(24).fill(0);
+      }
+      selectedDateData.forEach((e: any, j: number) => {
+        if (j === 0) {
+          tempChartData[i + 1] = Array(24).fill(0);
+        }
+        tempChartData[0][+e.id.hour] += e.count;
+        tempChartData[i + 1][+e.id.hour] += e.count;
+      });
+    });
+
+    tempChartData.forEach((data: any) => {
+      chartData.push([
+        {
+          data: data,
+          borderColor: "#73fac8",
+          backgroundColor: "rgba(115, 250, 200, 0.3)",
+          pointBackgroundColor: "#73fac8"
+        }
+      ]);
     });
 
     return {

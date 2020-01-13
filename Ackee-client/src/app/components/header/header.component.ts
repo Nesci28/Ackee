@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ElementRef, ViewChildren } from "@angular/core";
 import { StateService } from "../../services/state.service";
 import { State } from "../../models/app.enum";
 
@@ -19,8 +19,10 @@ export class HeaderComponent implements OnInit {
   }
 
   setRoute(route: State): void {
-    this.stateService.loading$.next(true);
-    this.stateService.state$.next(route);
+    if (route !== this.stateService.state$.value) {
+      this.stateService.loading$.next(true);
+      this.stateService.state$.next(route);
+    }
   }
 
   getLoading(): boolean {

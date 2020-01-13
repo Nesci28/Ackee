@@ -18,7 +18,7 @@ body {
   margin: 0;
 }
 
-ngb-datepicker {
+.range ngb-datepicker {
   @media screen and (max-width: 492px) {
     transform: scale(0.85) translate(-42px, 12px) !important;
   }
@@ -93,9 +93,16 @@ textarea {
 }
 
 .btn-group {
+  background-color: #6c757d;
+  border-radius: 0.25rem;
+
   @media screen and (max-width: 451px) {
     width: 100%;
   }
+}
+
+.btn-group label:first-of-type {
+  margin-right: 3px;
 }
 
 .d-flex-responsive {
@@ -147,6 +154,11 @@ textarea {
   &-error {
     border-radius: 6px;
     background-color: rgba(255, 0, 0, 0.15);
+  }
+
+  &-primary {
+    background-color: $primary !important;
+    color: $dark !important;
   }
 }
 

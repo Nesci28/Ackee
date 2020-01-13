@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
-import { Charts, RadioChoices, State } from "../../models/app.enum";
+import { RadioChoices, State } from "../../models/app.enum";
 import { AppDomains } from "../../models/app.model";
 import { Oses } from "../../models/backend.model";
 import { ChartsService } from "../../services/charts.service";

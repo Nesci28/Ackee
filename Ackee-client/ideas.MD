@@ -14,8 +14,9 @@
 - [x] BUG - Backend always creates new tokens
 - [x] Detailed durations graphs (Bubble 24hours)
   - [x] Scatter Graphs
-  - [ ] Date selector
-  - [ ] BUG - Chart show in 'test' instead of 'CodeWars'
+  - [x] Date selector
+  - [x] BUG - Chart show in 'test' instead of 'CodeWars'
+- [x] BUG - Header scrollbar height
 
 ---
 
@@ -25,5 +26,7 @@
 - [x] Rewrite component by graphs style
   - [x] Rewrite graphs components to be dump
 - [x] re-use token on login
-- [ ] FEATURE - Time visited (Created date of a Record)
-  - [ ] Add to Front-end (show a line? graph)
+- [x] FEATURE - Time visited (Created date of a Record)
+  - [x] Add to Front-end (show a line? graph)
+- [ ] FEATURE - Add event to the Tracker
+- [ ] FEATURE - Show event in the Front-end

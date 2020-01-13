@@ -1,19 +1,19 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
+import { AppDomains } from "../../../models/app.model";
+import { BaseComponent } from "../base/base.component";
+import { StateService } from "../../../services/state.service";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
-import { AppDomains } from "../../../models/app.model";
-import { StateService } from "../../../services/state.service";
-import { BaseComponent } from "../base/base.component";
-
 @Component({
-  selector: "app-graph-bubble",
-  templateUrl: "./graph-bubble.component.html",
-  styleUrls: ["./graph-bubble.component.scss"]
+  selector: "app-graph-line",
+  templateUrl: "./graph-line.component.html",
+  styleUrls: ["./graph-line.component.scss"]
 })
-export class GraphBubbleComponent extends BaseComponent implements OnInit {
+export class GraphLineComponent extends BaseComponent implements OnInit {
   @Input() domain: AppDomains;
   @Input() chartData: any;
   @Input() chartLabels: string;
+  @Input() loadingType: string;
 
   chartOptions: any;
   domains: AppDomains[];
@@ -86,9 +86,7 @@ export class GraphBubbleComponent extends BaseComponent implements OnInit {
         displayColors: false,
         callbacks: {
           title: (tooltipItem: any) => {
-            const value =
-              +tooltipItem[0].value === 0.1 ? "0" : tooltipItem[0].value;
-            return `${value} mins`;
+            return +tooltipItem[0].value === 0.1 ? "0" : tooltipItem[0].value;
           },
           label: (tooltipItem: any, data: any) => {
             const index = tooltipItem.index;
@@ -107,5 +105,12 @@ export class GraphBubbleComponent extends BaseComponent implements OnInit {
 
   getHeight(): string {
     return this.stateService.getHeight();
+  }
+
+  checkIfChartDataHasData(): boolean {
+    if (this.chartData[0]) {
+      return this.chartData[0].data.filter(el => el !== 0).length > 0;
+    }
+    return false;
   }
 }

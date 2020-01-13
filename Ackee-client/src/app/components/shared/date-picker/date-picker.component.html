@@ -1,0 +1,20 @@
+<form [formGroup]="form" class="form-inline">
+  <div class="form-group">
+    <div class="input-group">
+      <input
+        name="dp"
+        ngbDatepicker
+        #d="ngbDatepicker"
+        formControlName="singleDate"
+      />
+      <div class="input-group-append">
+        <button
+          [ngClass]="{ 'pointer-danger': disabled }"
+          class="btn btn-outline-secondary calendar"
+          (click)="d.toggle()"
+          type="button"
+        ></button>
+      </div>
+    </div>
+  </div>
+</form>

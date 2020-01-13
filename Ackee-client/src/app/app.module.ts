@@ -22,7 +22,8 @@ import { GraphBarComponent } from "./components/shared/graph-bar/graph-bar.compo
 import { GraphPieComponent } from "./components/shared/graph-pie/graph-pie.component";
 import { GraphTableComponent } from "./components/shared/graph-table/graph-table.component";
 import { GraphBubbleComponent } from "./components/shared/graph-bubble/graph-bubble.component";
-import { AppDatePickerComponent } from "./components/shared/app-date-picker/app-date-picker.component";
+import { DatePickerComponent } from "./components/shared/date-picker/date-picker.component";
+import { GraphLineComponent } from './components/shared/graph-line/graph-line.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { AppDatePickerComponent } from "./components/shared/app-date-picker/app-
     GraphPieComponent,
     GraphTableComponent,
     GraphBubbleComponent,
-    AppDatePickerComponent
+    DatePickerComponent,
+    GraphLineComponent
   ],
   imports: [
     NgbModule,

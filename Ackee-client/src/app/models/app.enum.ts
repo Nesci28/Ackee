@@ -19,12 +19,14 @@ export enum Modal {
 export enum Charts {
   bar = "bar",
   pie = "pie",
-  bubble = "bubble"
+  bubble = "bubble",
+  line = "line"
 }
 
 export enum ViewsEnum {
   unique = "unique",
-  total = "total"
+  total = "total",
+  time = "time"
 }
 
 export enum DurationsEnum {

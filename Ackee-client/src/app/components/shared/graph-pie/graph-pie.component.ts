@@ -4,6 +4,7 @@ import { StateService } from "../../../services/state.service";
 import { AppDomains } from "../../../models/app.model";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
 import { BaseComponent } from "../base/base.component";
+import { Charts } from "../../../models/app.enum";
 
 @Component({
   selector: "app-graph-pie",
@@ -34,14 +35,7 @@ export class GraphPieComponent extends BaseComponent implements OnInit {
   }
 
   getHeight(): string {
-    let res: number;
-    if (window.innerWidth < 576)
-      res = Math.round(((window.innerWidth - 73) * 250) / 501);
-    if (window.innerWidth > 575) res = 233;
-    if (window.innerWidth > 767) res = 323;
-    if (window.innerWidth > 991) res = 203;
-    if (window.innerWidth > 1199) res = 248;
-    return `${res}px`;
+    return this.stateService.getHeight();
   }
 
   showGraph(): boolean {

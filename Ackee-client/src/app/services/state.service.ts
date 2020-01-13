@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
+import { NgbCalendar } from "@ng-bootstrap/ng-bootstrap";
+import { NgbDate } from "@ng-bootstrap/ng-bootstrap/datepicker/ngb-date";
 import { BehaviorSubject } from "rxjs";
 
-import { AppDomains } from "../models/app.model";
 import { State } from "../models/app.enum";
-import { NgbDate } from "@ng-bootstrap/ng-bootstrap/datepicker/ngb-date";
-import { NgbCalendar } from "@ng-bootstrap/ng-bootstrap";
+import { AppDomains } from "../models/app.model";
 
 @Injectable({
   providedIn: "root"
@@ -29,7 +29,12 @@ export class StateService {
     this.getFromDate();
     this.toDate$.next(this.calendar.getToday());
 
-    this.singleDate$.next({ year: 2019, month: 12, day: 20 } as any);
+    const today = new Date();
+    this.singleDate$.next({
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate()
+    } as any);
   }
 
   getFromDate(): void {
@@ -65,5 +70,16 @@ export class StateService {
     const check = new Date(date);
 
     return check > from && check < to;
+  }
+
+  getHeight(): string {
+    let res: number;
+    if (window.innerWidth < 576)
+      res = Math.round(((window.innerWidth - 73) * 250) / 501);
+    if (window.innerWidth > 575) res = 233;
+    if (window.innerWidth > 767) res = 323;
+    if (window.innerWidth > 991) res = 203;
+    if (window.innerWidth > 1199) res = 248;
+    return `${res}px`;
   }
 }
