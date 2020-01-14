@@ -15,7 +15,7 @@ const getTrackerName = () => {
 };
 
 const tracker = () => {
-  const filePath = require.resolve('ackee-tracker');
+  const filePath = require.resolve('../ackee-tracker.min.js');
   const data = readFile(filePath, 'utf8');
 
   return async (req, res) => {
