@@ -15,10 +15,31 @@ export class GraphPieComponent extends BaseComponent implements OnInit {
   @Input() domain: AppDomains;
   @Input() chartData: any;
   @Input() chartLabels: string;
-  @Input() chartOptions: any;
 
   domains: AppDomains[];
   loading: boolean;
+  options = {
+    responsive: true,
+    tooltips: {
+      enabled: true,
+      mode: "x-axis",
+      yAlign: "bottom",
+      backgroundColor: "#fff",
+      titleFontSize: 24,
+      titleFontColor: "#333",
+      titleAlign: "center",
+      bodyFontColor: "#333",
+      xPadding: 10,
+      cornerRadius: 0,
+      titleMarginBottom: 0,
+      displayColors: false,
+      callbacks: {
+        title: (tooltipItem: any) => {
+          return tooltipItem[0].value;
+        }
+      }
+    }
+  };
 
   constructor(private stateService: StateService) {
     super();

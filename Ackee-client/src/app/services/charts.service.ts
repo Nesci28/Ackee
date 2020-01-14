@@ -15,14 +15,11 @@ export class ChartsService {
     for (let i = numberOfDays; i >= 0; i--) {
       arr.push(
         (
-          new Date(
-            this.stateService.convertNgbDateToString(
-              this.stateService.toDate$.value
-            )
-          ).getDate() - i
+          new Date(new Date().toUTCString().substr(0, 25)).getDate() - i
         ).toString()
       );
     }
+
     return arr;
   }
 
@@ -37,32 +34,9 @@ export class ChartsService {
   }
 
   createChartBubbleOrLineLabel(): string[] {
-    return [
-      "00:00",
-      "01:00",
-      "02:00",
-      "03:00",
-      "04:00",
-      "05:00",
-      "06:00",
-      "07:00",
-      "08:00",
-      "09:00",
-      "10:00",
-      "11:00",
-      "12:00",
-      "13:00",
-      "14:00",
-      "15:00",
-      "16:00",
-      "17:00",
-      "18:00",
-      "19:00",
-      "20:00",
-      "21:00",
-      "22:00",
-      "23:00"
-    ];
+    return [...Array(24).keys()].map(
+      (num: any) => `${num.toString().padStart(2, "0")}:00`
+    );
   }
 
   configureChartBar(
@@ -73,78 +47,42 @@ export class ChartsService {
     const chartData = [];
     const chartOptions = [];
 
-    // Initializing the Charts Data
-    let dataArrAll = [{}];
-    for (let i = 0; i < domains.length; i++) {
-      dataArrAll.push({});
-      for (let j = numberOfDays; j > -1; j--) {
-        if (i === 0) {
-          dataArrAll[0][this.getDaysAgo(numberOfDays, j)] = 0.1;
-        }
-        dataArrAll[i + 1][this.getDaysAgo(numberOfDays, j)] = 0.1;
-      }
+    const datesArray = [];
+    for (let i = numberOfDays; i >= 0; i--) {
+      const date = new Date(new Date().toUTCString().substr(0, 25));
+      date.setDate(date.getDate() - i);
+      datesArray.push(
+        `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+      );
     }
-
-    // Creating Arrays with the real Charts Data Values
-    let time = false;
+    const tempArr = [];
     domains.forEach((domain: AppDomains, i: number) => {
-      const data = datas.data.filter((e: AppDomains) => e.id === domain.id)[0];
-      data.data.forEach((viewData: any) => {
-        const fullDate = viewData.id;
-        const daysAgo = `${fullDate.month
-          .toString()
-          .padStart(2, "0")}-${fullDate.day.toString().padStart(2, "0")}-${
-          fullDate.year
-        }`;
-        if (dataArrAll[0][daysAgo]) {
-          if (dataArrAll[0][daysAgo] === 0.1) {
-            dataArrAll[0][daysAgo] = 0;
-          }
-          if (dataArrAll[i + 1][daysAgo] === 0.1) {
-            dataArrAll[i + 1][daysAgo] = 0;
-          }
-          if (viewData.count) {
-            dataArrAll[0][daysAgo] += viewData.count;
-            dataArrAll[i + 1][daysAgo] += viewData.count;
-          }
-          if (viewData.average) {
-            time = true;
-            dataArrAll[0][daysAgo] += Math.floor(viewData.average / 1000);
-            dataArrAll[i + 1][daysAgo] += Math.floor(viewData.average / 1000);
-          }
+      if (i === 0) {
+        tempArr.push(new Array(numberOfDays + 1).fill(0));
+      }
+      tempArr.push(new Array(numberOfDays + 1).fill(0));
+      const data = datas.data.filter((dt: any) => dt.id === domain.id)[0];
+      data.data.forEach((el: any) => {
+        const index = datesArray.indexOf(
+          `${el.id.year}-${el.id.month}-${el.id.day}`
+        );
+        if (index > -1) {
+          tempArr[0][index] += el.count || el.average / 1000;
+          tempArr[i + 1][index] += el.count || el.average / 1000;
         }
       });
     });
 
-    // Creating Charts Data
-    dataArrAll.forEach((data: any, i: number) => {
+    tempArr.forEach((data: any, i: number) => {
       chartOptions[i] = this.setChartOptions(numberOfDays);
-
-      // Converting data to an Chart data (array of numbers)
-      const sortedDays = this.sortArrayOfDate(data);
-      const tempData = [];
-      sortedDays.forEach((day: string) => {
-        tempData.push(data[day]);
-      });
-
       chartData.push([
         {
-          data: tempData,
+          data: data,
           backgroundColor: "#6e7373",
           hoverBackgroundColor: "#73fac8",
           hoverBorderColor: "#73fac8"
         }
       ]);
-      chartOptions[i].scales.yAxes[0].ticks.max = Math.max(...tempData);
-      if (chartOptions[i].scales.yAxes[0].ticks.max === 0.1) {
-        chartOptions[i].scales.yAxes[0].ticks.max = 10;
-      }
-      if (time) {
-        chartOptions[i].scales.yAxes[0].ticks.callback = (time: number) =>
-          this.formatSecsAsMins(time);
-        chartOptions[i].tooltips.callbacks.title = (tooltipItem: any) =>
-          this.formatSecsAsMins(+tooltipItem[0].value);
-      }
     });
 
     return {
@@ -155,7 +93,6 @@ export class ChartsService {
 
   configureChartPie(datas: any): any {
     const chartData = [];
-    const chartOptions = [];
     let dataArr = datas.data.map((x: any) => x.count);
     if (dataArr[0] === undefined) {
       dataArr = datas.data.map((x: any) => Object.values(x));
@@ -183,36 +120,8 @@ export class ChartsService {
       }
     ]);
 
-    chartOptions.push({
-      responsive: true
-      // TODO: FIX Label
-      // tooltips: {
-      //   enabled: true,
-      //   mode: "x-axis",
-      //   yAlign: "bottom",
-      //   backgroundColor: "#fff",
-      //   titleFontSize: 24,
-      //   titleFontColor: "#333",
-      //   titleAlign: "center",
-      //   bodyFontColor: "#333",
-      //   xPadding: 10,
-      //   cornerRadius: 0,
-      //   titleMarginBottom: 0,
-      //   displayColors: false,
-      //   callbacks: {
-      //     title: (tooltipItem: any) => {
-      //       return +tooltipItem[0].value === 0.1 ? "0" : tooltipItem[0].value;
-      //     },
-      //     label: (tooltipItem: any) => {
-      //       return tooltipItem.index;
-      //     }
-      //   }
-      // }
-    });
-
     return {
-      chartData,
-      chartOptions
+      chartData
     };
   }
 
@@ -281,7 +190,7 @@ export class ChartsService {
       });
     });
 
-    tempChartData.forEach((data: any) => {
+    tempChartData.forEach((data: any, i: number) => {
       chartData.push([
         {
           data: data,
@@ -306,37 +215,6 @@ export class ChartsService {
       this.stateService.convertDateToString(d1) ===
       this.stateService.convertDateToString(d2)
     );
-  }
-
-  getDaysAgo(index: number, numberOfDays: number = 0): string {
-    let date: any = this.stateService.toDate$.value;
-    date = new Date(this.stateService.convertNgbDateToString(date));
-    date.setDate(date.getDate() - Math.abs(numberOfDays - index));
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}-${date
-      .getDate()
-      .toString()
-      .padStart(2, "0")}-${date.getFullYear()}`;
-  }
-
-  formatSecsAsMins(time: number): string {
-    if (time === 0.1) return `0`;
-    const minutes = Math.floor(time / 60);
-    const seconds = time - minutes * 60;
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  }
-
-  sortArrayOfDate(data: any): any {
-    return Object.keys(data).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    );
-  }
-
-  getDiffDays(id: { day: number; month: number; year: number }): number {
-    const day = new Date(id.year, id.month, id.day);
-    let t: any = this.stateService.toDate$.value;
-    t = new Date(`${t.month}/${t.day}/${t.year}`);
-    const today = new Date(t.getFullYear(), t.getMonth() + 1, t.getDate());
-    return Math.round(Math.abs((+day - +today) / (24 * 60 * 60 * 1000)));
   }
 
   setChartOptions(numberOfDays: number): any {

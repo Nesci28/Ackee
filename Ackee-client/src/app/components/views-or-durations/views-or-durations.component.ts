@@ -134,7 +134,6 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
       );
     } else {
       this.chartLabels = this.chartsService.createChartBubbleOrLineLabel();
-      console.log("this.chartLabels :", this.chartLabels);
     }
   }
 

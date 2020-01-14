@@ -152,7 +152,7 @@ export class OsesOrPlatformsComponent extends BaseComponent implements OnInit {
       const chartsObj = this.chartsService.configureChartPie(finalData);
       // Configuring the Chart
       this.chartData[i] = chartsObj.chartData[0];
-      this.chartOptions[i] = chartsObj.chartOptions[0];
+      // this.chartOptions[i] = chartsObj.chartOptions[0];
     });
   }
 }
