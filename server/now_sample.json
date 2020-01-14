@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "name": "ackee-server",
+  "builds": [
+    {
+      "src": "src/index.js",
+      "use": "@now/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "src/index.js"
+    }
+  ],
+  "env": {
+    "ACKEE_MONGODB": "",
+    "ACCESS_CONTROL_ALLOW_ORIGIN": "",
+    "ACKEE_USERNAME": "",
+    "ACKEE_PASSWORD": "",
+    "ACKEE_TRACKER": ""
+  }
+}
