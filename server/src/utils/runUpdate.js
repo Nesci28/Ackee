@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (schema, id, eventsTriggered, data = {}, props = []) => {
+module.exports = (schema, id, eventsTriggered = [], data = {}, props = []) => {
   const _set = {};
 
   Object.keys(data).forEach(key => {
@@ -24,12 +24,9 @@ module.exports = (schema, id, eventsTriggered, data = {}, props = []) => {
       new: true,
     },
   };
-  if (eventsTriggered) {
+  if (eventsTriggered.length > 0) {
     query.set.$push = {
-      eventsTriggered: {
-        events: eventsTriggered,
-        date: new Date(),
-      },
+      eventsTriggered: eventsTriggered,
     };
   }
   return schema.findOneAndUpdate(query.id, query.set, query.new);

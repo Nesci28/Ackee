@@ -21,6 +21,7 @@ const languages = require('./routes/languages');
 const durations = require('./routes/durations');
 const oses = require('./routes/oses');
 const platforms = require('./routes/platforms');
+const events = require('./routes/events');
 
 const catchError = fn => async (req, res) => {
   try {
@@ -101,6 +102,8 @@ const routes = [
   get('/domains/:domainId/oses', pipe(requireAuth, oses.get)),
 
   get('/domains/:domainId/platforms', pipe(requireAuth, platforms.get)),
+
+  get('/domains/:domainId/events', pipe(requireAuth, events.get)),
 
   get('/*', notFound),
   post('/*', notFound),
