@@ -2,14 +2,14 @@
 
 - [x] Date range selector
 - [x] Add oses graphs (pie charts - only by domain (no main))
-  - [x] Date ranger selector
+  - [x] Date range selector
 - [x] Add platform graphs (pie charts - only by domain (no main))
-  - [x] Date ranger selector
+  - [x] Date range selector
 - [x] Add Languages table (in lines like Original-Ackee)
-  - [x] Date ranger selector
+  - [x] Date range selector
 - [x] Add pages table (in lines like Original-Ackee)
   - [x] Routes selector (ex: kata -> sucess, fail)
-  - [x] Date ranger selector
+  - [x] Date range selector
 - [x] BUG - Date selector doesnt update numberOfDays in PagesOrLanguages
 - [x] BUG - Backend always creates new tokens
 - [x] Detailed durations graphs (Bubble 24hours)
@@ -28,5 +28,7 @@
 - [x] re-use token on login
 - [x] FEATURE - Time visited (Created date of a Record)
   - [x] Add to Front-end (show a line? graph)
-- [ ] FEATURE - Add event to the Tracker
-- [ ] FEATURE - Show event in the Front-end
+- [x] FEATURE - Add event to the Tracker
+- [x] FEATURE - Show event in the Front-end
+  - [ ] BUG - Show hourglass
+  - [ ] Add Date range selector

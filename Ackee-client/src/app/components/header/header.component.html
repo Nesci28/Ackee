@@ -34,6 +34,12 @@
       >
         Durations</button
       ><button
+        [ngClass]="{ active: getRoute() === State.events }"
+        class="header__button link"
+        (click)="setRoute(State.events)"
+      >
+        Events</button
+      ><button
         [ngClass]="{ active: getRoute() === State.languages }"
         class="header__button link"
         (click)="setRoute(State.languages)"

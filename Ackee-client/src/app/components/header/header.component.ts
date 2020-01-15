@@ -1,6 +1,7 @@
-import { Component, OnInit, ElementRef, ViewChildren } from "@angular/core";
-import { StateService } from "../../services/state.service";
+import { Component, OnInit } from "@angular/core";
+
 import { State } from "../../models/app.enum";
+import { StateService } from "../../services/state.service";
 
 @Component({
   selector: "app-header",

@@ -24,6 +24,7 @@ import { GraphTableComponent } from "./components/shared/graph-table/graph-table
 import { GraphBubbleComponent } from "./components/shared/graph-bubble/graph-bubble.component";
 import { DatePickerComponent } from "./components/shared/date-picker/date-picker.component";
 import { GraphLineComponent } from './components/shared/graph-line/graph-line.component';
+import { EventsComponent } from './components/events/events.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { GraphLineComponent } from './components/shared/graph-line/graph-line.co
     GraphTableComponent,
     GraphBubbleComponent,
     DatePickerComponent,
-    GraphLineComponent
+    GraphLineComponent,
+    EventsComponent
   ],
   imports: [
     NgbModule,

@@ -32,6 +32,12 @@ export class HttpService {
     );
   }
 
+  getEvents(domainId: string): any {
+    return this.httpClient.get<any>(
+      `${environment.url}/domains/${domainId}/events`
+    );
+  }
+
   renameDomain(domain: string, title: string): Observable<any> {
     return this.httpClient.put<any>(`${environment.url}/domains/${domain}`, {
       title

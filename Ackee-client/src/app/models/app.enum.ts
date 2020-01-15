@@ -3,6 +3,7 @@ export enum State {
   views = "views",
   pages = "pages",
   durations = "durations",
+  events = "events",
   languages = "languages",
   oses = "oses",
   platforms = "platforms",
