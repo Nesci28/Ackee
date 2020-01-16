@@ -12,10 +12,9 @@ const {
 const response = entry => ({
   type: 'duration',
   data: {
-    id: entry._id,
+    id: entry,
     average: entry.average,
     count: entry.count,
-    created: entry.created,
   },
 });
 
@@ -26,9 +25,9 @@ const responses = entries => ({
 
 const get = async req => {
   const { domainId } = req.params;
-  const { type } = req.query;
+  const { type, dateFrom, dateTo } = req.query;
 
-  const entries = await durations.get(domainId, type);
+  const entries = await durations.get(domainId, type, dateFrom, dateTo);
 
   switch (type) {
     case DURATIONS_TYPE_AVERAGE:

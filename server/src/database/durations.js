@@ -1,7 +1,6 @@
 'use strict';
 
 const Record = require('../schemas/Record');
-const dateWithOffset = require('../utils/dateWithOffset');
 
 const {
   DURATIONS_INTERVAL,
@@ -71,13 +70,21 @@ const matchLimit = {
   },
 };
 
-const getAverage = async id => {
+function getAggregateMatch(id, dateFrom, dateTo) {
+  const match = { $match: { domainId: id } };
+  if (dateFrom !== undefined && dateTo !== undefined) {
+    match.$match.updated = {
+      $gte: new Date(dateFrom),
+      $lte: new Date(dateTo),
+    };
+  }
+
+  return match;
+}
+
+const getAverage = async (id, dateFrom, dateTo) => {
   return Record.aggregate([
-    {
-      $match: {
-        domainId: id,
-      },
-    },
+    getAggregateMatch(id, dateFrom, dateTo),
     projectDuration,
     projectInterval,
     projectMinInterval,
@@ -110,13 +117,9 @@ const getAverage = async id => {
   ]);
 };
 
-const getDetailed = async id => {
+const getDetailed = async (id, dateFrom, dateTo) => {
   const averageEntries = await Record.aggregate([
-    {
-      $match: {
-        domainId: id,
-      },
-    },
+    getAggregateMatch(id, dateFrom, dateTo),
     projectDuration,
     projectInterval,
     projectMinInterval,
@@ -135,11 +138,7 @@ const getDetailed = async id => {
   if (averageEntries.length === 0) return [];
 
   const detailedEntries = await Record.aggregate([
-    {
-      $match: {
-        domainId: id,
-      },
-    },
+    getAggregateMatch(id, dateFrom, dateTo),
     projectDuration,
     projectInterval,
     {
@@ -156,12 +155,6 @@ const getDetailed = async id => {
         count: {
           $sum: 1,
         },
-        created: { $push: '$$ROOT.created' },
-      },
-    },
-    {
-      $addFields: {
-        average: averageEntries[0].average,
       },
     },
     {
@@ -173,12 +166,12 @@ const getDetailed = async id => {
   return detailedEntries;
 };
 
-const get = async (id, type) => {
+const get = async (id, type, dateFrom, dateTo) => {
   switch (type) {
     case DURATIONS_TYPE_AVERAGE:
-      return getAverage(id);
+      return getAverage(id, dateFrom, dateTo);
     case DURATIONS_TYPE_DETAILED:
-      return getDetailed(id);
+      return getDetailed(id, dateFrom, dateTo);
   }
 };
 

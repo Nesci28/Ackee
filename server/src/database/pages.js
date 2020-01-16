@@ -2,20 +2,31 @@
 
 const Record = require('../schemas/Record');
 
-const getTop = async id => {
+const getTop = async (id, dateFrom, dateTo) => {
+  const match = {
+    $match: {},
+  };
+  if (id !== undefined) {
+    match.$match.domainId = id;
+  }
+  if (dateFrom !== undefined && dateTo !== undefined) {
+    match.$match.updated = {
+      $gte: new Date(dateFrom),
+      $lte: new Date(dateTo),
+    };
+  }
+
   return Record.aggregate([
-    {
-      $match: {
-        domainId: id,
-      },
-    },
+    match,
     {
       $group: {
-        _id: '$siteLocation',
+        _id: {
+          siteLocation: '$siteLocation',
+          domain: '$domainId',
+        },
         count: {
           $sum: 1,
         },
-        created: { $push: '$$ROOT.created' },
       },
     },
     {
@@ -26,8 +37,8 @@ const getTop = async id => {
   ]);
 };
 
-const get = async id => {
-  return getTop(id);
+const get = async (id, dateFrom, dateTo) => {
+  return getTop(id, dateFrom, dateTo);
 };
 
 module.exports = {

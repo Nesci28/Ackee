@@ -11,8 +11,9 @@ const responses = entries => ({
 
 const get = async req => {
   const { domainId } = req.params;
+  const { dateFrom, dateTo } = req.query;
 
-  const entries = await events.get(domainId);
+  const entries = await events.get(domainId, dateFrom, dateTo);
   return responses(entries);
 };
 

@@ -7,7 +7,6 @@ const response = entry => ({
   data: {
     id: entry._id,
     count: entry.count,
-    created: entry.created,
   },
 });
 
@@ -18,8 +17,9 @@ const responses = entries => ({
 
 const get = async req => {
   const { domainId } = req.params;
+  const { dateFrom, dateTo } = req.query;
 
-  const entries = await languages.get(domainId);
+  const entries = await languages.get(domainId, dateFrom, dateTo);
 
   return responses(entries);
 };

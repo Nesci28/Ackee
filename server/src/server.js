@@ -90,20 +90,27 @@ const routes = [
   patch('/domains/:domainId/records/:recordId', records.update),
 
   get('/domains/:domainId/views', pipe(requireAuth, views.get)),
+  get('/views', pipe(requireAuth, views.get)),
 
   get('/domains/:domainId/pages', pipe(requireAuth, pages.get)),
+  get('/pages', pipe(requireAuth, pages.get)),
 
   get('/domains/:domainId/referrers', pipe(requireAuth, referrers.get)),
 
   get('/domains/:domainId/languages', pipe(requireAuth, languages.get)),
+  get('/languages', pipe(requireAuth, languages.get)),
 
   get('/domains/:domainId/durations', pipe(requireAuth, durations.get)),
+  get('/durations', pipe(requireAuth, durations.get)),
 
   get('/domains/:domainId/oses', pipe(requireAuth, oses.get)),
+  get('/oses', pipe(requireAuth, oses.get)),
 
   get('/domains/:domainId/platforms', pipe(requireAuth, platforms.get)),
+  get('/platforms', pipe(requireAuth, platforms.get)),
 
   get('/domains/:domainId/events', pipe(requireAuth, events.get)),
+  get('/events', pipe(requireAuth, events.get)),
 
   get('/*', notFound),
   post('/*', notFound),

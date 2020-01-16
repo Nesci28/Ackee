@@ -17,34 +17,23 @@ const response = entry => ({
       day: entry._id.day,
       month: entry._id.month,
       year: entry._id.year,
-    },
-    count: entry.count,
-  },
-});
-
-const responseTime = entry => ({
-  type: 'times',
-  data: {
-    id: {
-      day: entry._id.day,
-      month: entry._id.month,
-      year: entry._id.year,
       hour: entry._id.hour,
+      domain: entry._id.domainId,
     },
     count: entry.count,
   },
 });
 
-const responses = (entries, type) => ({
+const responses = entries => ({
   type: 'views',
-  data: entries.map(type !== VIEWS_TYPE_TIME ? response : responseTime),
+  data: entries.map(response),
 });
 
 const get = async req => {
   const { domainId } = req.params;
-  const { type } = req.query;
+  const { type, dateFrom, dateTo } = req.query;
 
-  const entries = await views.get(domainId, type);
+  const entries = await views.get(domainId, type, dateFrom, dateTo);
 
   switch (type) {
     case VIEWS_TYPE_UNIQUE:

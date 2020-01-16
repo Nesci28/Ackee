@@ -8,17 +8,27 @@ const {
   VIEWS_TYPE_TIME,
 } = require('../constants/views');
 
-const getUnique = async id => {
-  return Record.aggregate([
-    {
-      $match: {
-        clientId: {
-          $exists: true,
-          $ne: null,
-        },
-        domainId: id,
+const getUnique = async (id, dateFrom, dateTo) => {
+  const match = {
+    $match: {
+      clientId: {
+        $exists: true,
+        $ne: null,
       },
     },
+  };
+  if (id !== undefined) {
+    match.$match.domainId = id;
+  }
+  if (dateFrom !== undefined && dateTo !== undefined) {
+    match.$match.updated = {
+      $gte: new Date(dateFrom),
+      $lte: new Date(dateTo),
+    };
+  }
+
+  return Record.aggregate([
+    match,
     {
       $group: {
         _id: {
@@ -31,6 +41,7 @@ const getUnique = async id => {
           year: {
             $year: '$created',
           },
+          domainId: '$domainId',
         },
         count: {
           $sum: 1,
@@ -47,13 +58,20 @@ const getUnique = async id => {
   ]);
 };
 
-const getTotal = async id => {
+const getTotal = async (id, dateFrom, dateTo) => {
+  const match = { $match: {} };
+  if (id !== undefined) {
+    match.$match.domainId = id;
+  }
+  if (dateFrom !== undefined && dateTo !== undefined) {
+    match.$match.updated = {
+      $gte: new Date(dateFrom),
+      $lte: new Date(dateTo),
+    };
+  }
+
   return Record.aggregate([
-    {
-      $match: {
-        domainId: id,
-      },
-    },
+    match,
     {
       $group: {
         _id: {
@@ -66,6 +84,7 @@ const getTotal = async id => {
           year: {
             $year: '$created',
           },
+          domainId: '$domainId',
         },
         count: {
           $sum: 1,
@@ -82,17 +101,20 @@ const getTotal = async id => {
   ]);
 };
 
-const getTime = async id => {
+const getTime = async (id, dateFrom, dateTo) => {
+  const match = { $match: {} };
+  if (id !== undefined) {
+    match.$match.domainId = id;
+  }
+  if (dateFrom !== undefined && dateTo !== undefined) {
+    match.$match.updated = {
+      $gte: new Date(dateFrom),
+      $lte: new Date(dateTo),
+    };
+  }
+
   return Record.aggregate([
-    {
-      $match: {
-        clientId: {
-          $exists: true,
-          $ne: null,
-        },
-        domainId: id,
-      },
-    },
+    match,
     {
       $group: {
         _id: {
@@ -108,6 +130,7 @@ const getTime = async id => {
           hour: {
             $hour: '$created',
           },
+          domainId: '$domainId',
         },
         count: {
           $sum: 1,
@@ -124,14 +147,14 @@ const getTime = async id => {
   ]);
 };
 
-const get = async (id, type) => {
+const get = async (id, type, dateFrom, dateTo) => {
   switch (type) {
     case VIEWS_TYPE_UNIQUE:
-      return getUnique(id);
+      return getUnique(id, dateFrom, dateTo);
     case VIEWS_TYPE_TOTAL:
-      return getTotal(id);
+      return getTotal(id, dateFrom, dateTo);
     case VIEWS_TYPE_TIME:
-      return getTime(id);
+      return getTime(id, dateFrom, dateTo);
   }
 };
 
