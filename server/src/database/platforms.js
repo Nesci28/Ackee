@@ -10,21 +10,20 @@ const getTop = async (id, dateFrom, dateTo) => {
       },
     },
   };
-  if (id !== undefined) {
+  if (id) {
     match.$match.domainId = id;
   }
-  if (dateFrom !== undefined && dateTo !== undefined) {
+  if (dateFrom && dateTo) {
     match.$match.updated = {
       $gte: new Date(dateFrom),
       $lte: new Date(dateTo),
     };
   }
 
-  return Record.aggregate([
-    match,
-    {
-      $group: {
-        _id: {
+  const group = {
+    $group: {
+      _id: {
+        size: {
           $switch: {
             branches: [
               { case: { $gte: ['$browserWidth', 1200] }, then: 'X-large' },
@@ -35,12 +34,17 @@ const getTop = async (id, dateFrom, dateTo) => {
             ],
           },
         },
-        count: {
-          $sum: 1,
-        },
+      },
+      count: {
+        $sum: 1,
       },
     },
-  ]);
+  };
+  if (!id) {
+    group.$group._id.domainId = '$domainId';
+  }
+
+  return Record.aggregate([match, group]);
 };
 
 const get = async (id, dateFrom, dateTo) => {

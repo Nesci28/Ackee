@@ -82,31 +82,36 @@ function getAggregateMatch(id, dateFrom, dateTo) {
   return match;
 }
 
-const getAverage = async (id, dateFrom, dateTo) => {
+const getAverage = async (id, dateFrom, dateTo, all) => {
+  const group = {
+    $group: {
+      _id: {
+        day: {
+          $dayOfMonth: '$created',
+        },
+        month: {
+          $month: '$created',
+        },
+        year: {
+          $year: '$created',
+        },
+      },
+      average: {
+        $avg: '$duration',
+      },
+    },
+  };
+  if (all) {
+    group.$group._id.domainId = id;
+  }
+
   return Record.aggregate([
     getAggregateMatch(id, dateFrom, dateTo),
     projectDuration,
     projectInterval,
     projectMinInterval,
     matchLimit,
-    {
-      $group: {
-        _id: {
-          day: {
-            $dayOfMonth: '$created',
-          },
-          month: {
-            $month: '$created',
-          },
-          year: {
-            $year: '$created',
-          },
-        },
-        average: {
-          $avg: '$duration',
-        },
-      },
-    },
+    group,
     {
       $sort: {
         '_id.year': -1,
@@ -144,12 +149,23 @@ const getDetailed = async (id, dateFrom, dateTo) => {
     {
       $group: {
         _id: {
-          $cond: {
-            if: {
-              $gte: ['$duration', DURATIONS_LIMIT],
+          time: {
+            $cond: {
+              if: {
+                $gte: ['$duration', DURATIONS_LIMIT],
+              },
+              then: DURATIONS_LIMIT,
+              else: '$duration',
             },
-            then: DURATIONS_LIMIT,
-            else: '$duration',
+          },
+          day: {
+            $dayOfMonth: '$created',
+          },
+          month: {
+            $month: '$created',
+          },
+          year: {
+            $year: '$created',
           },
         },
         count: {
@@ -159,17 +175,19 @@ const getDetailed = async (id, dateFrom, dateTo) => {
     },
     {
       $sort: {
-        _id: 1,
+        '_id.year': -1,
+        '_id.month': -1,
+        '_id.day': -1,
       },
     },
   ]);
   return detailedEntries;
 };
 
-const get = async (id, type, dateFrom, dateTo) => {
+const get = async (id, type, dateFrom, dateTo, all) => {
   switch (type) {
     case DURATIONS_TYPE_AVERAGE:
-      return getAverage(id, dateFrom, dateTo);
+      return getAverage(id, dateFrom, dateTo, all);
     case DURATIONS_TYPE_DETAILED:
       return getDetailed(id, dateFrom, dateTo);
   }

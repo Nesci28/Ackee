@@ -18,8 +18,8 @@ const response = entry => ({
       month: entry._id.month,
       year: entry._id.year,
       hour: entry._id.hour,
-      domain: entry._id.domainId,
     },
+    domainId: entry._id.domainId,
     count: entry.count,
   },
 });

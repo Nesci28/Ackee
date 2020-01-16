@@ -16,19 +16,23 @@ const getTop = async (id, dateFrom, dateTo) => {
     };
   }
 
-  return Record.aggregate([
-    match,
-    {
-      $group: {
-        _id: {
-          siteLocation: '$siteLocation',
-          domain: '$domainId',
-        },
-        count: {
-          $sum: 1,
-        },
+  const group = {
+    $group: {
+      _id: {
+        siteLocation: '$siteLocation',
+      },
+      count: {
+        $sum: 1,
       },
     },
+  };
+  if (!id) {
+    group.$group._id.domainId = '$domainId';
+  }
+
+  return Record.aggregate([
+    match,
+    group,
     {
       $sort: {
         count: -1,

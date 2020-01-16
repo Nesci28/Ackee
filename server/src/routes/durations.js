@@ -1,6 +1,6 @@
 'use strict';
 
-const { createError } = require('micro');
+const { createError, json, send } = require('micro');
 
 const durations = require('../database/durations');
 
@@ -12,8 +12,14 @@ const {
 const response = entry => ({
   type: 'duration',
   data: {
-    id: entry,
-    average: entry.average,
+    id: {
+      day: entry._id.day,
+      month: entry._id.month,
+      year: entry._id.year,
+    },
+    domainId: entry._id.domainId,
+    time: entry._id.time,
+    average: Math.round(entry.average) ? Math.round(entry.average) : undefined,
     count: entry.count,
   },
 });
@@ -39,6 +45,27 @@ const get = async req => {
   }
 };
 
+const getAll = async (req, res) => {
+  const { type, dateFrom, dateTo } = req.query;
+  const data = await json(req);
+
+  const entries = [];
+  await asyncForEach(data.domainsIds, async domainId => {
+    entries.push(
+      ...(await durations.get(domainId, type, dateFrom, dateTo, true)),
+    );
+  });
+
+  return send(res, 201, responses(entries));
+};
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+
 module.exports = {
   get,
+  getAll,
 };

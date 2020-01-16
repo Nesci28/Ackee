@@ -75,7 +75,7 @@ const notFound = async req => {
 
 const routes = [
   get('/tracker.js', ui.tracker),
-  get('/getTrackerName', ui.getTrackerName),
+  get('/tracker.name', ui.getTrackerName),
   customTrackerUrl != null ? get(customTrackerUrl, ui.tracker) : undefined,
 
   post('/tokens', tokens.add),
@@ -101,7 +101,7 @@ const routes = [
   get('/languages', pipe(requireAuth, languages.get)),
 
   get('/domains/:domainId/durations', pipe(requireAuth, durations.get)),
-  get('/durations', pipe(requireAuth, durations.get)),
+  post('/durations', pipe(requireAuth, durations.getAll)),
 
   get('/domains/:domainId/oses', pipe(requireAuth, oses.get)),
   get('/oses', pipe(requireAuth, oses.get)),
@@ -110,7 +110,6 @@ const routes = [
   get('/platforms', pipe(requireAuth, platforms.get)),
 
   get('/domains/:domainId/events', pipe(requireAuth, events.get)),
-  get('/events', pipe(requireAuth, events.get)),
 
   get('/*', notFound),
   post('/*', notFound),
