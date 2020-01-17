@@ -82,6 +82,14 @@ function getAggregateMatch(id, dateFrom, dateTo) {
   return match;
 }
 
+const sort = {
+  $sort: {
+    '_id.year': -1,
+    '_id.month': -1,
+    '_id.day': -1,
+  },
+};
+
 const getAverage = async (id, dateFrom, dateTo, all) => {
   const group = {
     $group: {
@@ -95,6 +103,9 @@ const getAverage = async (id, dateFrom, dateTo, all) => {
         year: {
           $year: '$created',
         },
+      },
+      count: {
+        $sum: 1,
       },
       average: {
         $avg: '$duration',
@@ -112,17 +123,11 @@ const getAverage = async (id, dateFrom, dateTo, all) => {
     projectMinInterval,
     matchLimit,
     group,
-    {
-      $sort: {
-        '_id.year': -1,
-        '_id.month': -1,
-        '_id.day': -1,
-      },
-    },
+    sort,
   ]);
 };
 
-const getDetailed = async (id, dateFrom, dateTo) => {
+const getDetailed = async (id, dateFrom, dateTo, all) => {
   const averageEntries = await Record.aggregate([
     getAggregateMatch(id, dateFrom, dateTo),
     projectDuration,
@@ -142,44 +147,46 @@ const getDetailed = async (id, dateFrom, dateTo) => {
   // No need to continue when there're no entries
   if (averageEntries.length === 0) return [];
 
+  const group = {
+    $group: {
+      _id: {
+        time: {
+          $cond: {
+            if: {
+              $gte: ['$duration', DURATIONS_LIMIT],
+            },
+            then: DURATIONS_LIMIT,
+            else: '$duration',
+          },
+        },
+        day: {
+          $dayOfMonth: '$created',
+        },
+        month: {
+          $month: '$created',
+        },
+        year: {
+          $year: '$created',
+        },
+        hour: {
+          $hour: '$created',
+        },
+      },
+      count: {
+        $sum: 1,
+      },
+    },
+  };
+  if (all) {
+    group.$group._id.domainId = id;
+  }
+
   const detailedEntries = await Record.aggregate([
     getAggregateMatch(id, dateFrom, dateTo),
     projectDuration,
     projectInterval,
-    {
-      $group: {
-        _id: {
-          time: {
-            $cond: {
-              if: {
-                $gte: ['$duration', DURATIONS_LIMIT],
-              },
-              then: DURATIONS_LIMIT,
-              else: '$duration',
-            },
-          },
-          day: {
-            $dayOfMonth: '$created',
-          },
-          month: {
-            $month: '$created',
-          },
-          year: {
-            $year: '$created',
-          },
-        },
-        count: {
-          $sum: 1,
-        },
-      },
-    },
-    {
-      $sort: {
-        '_id.year': -1,
-        '_id.month': -1,
-        '_id.day': -1,
-      },
-    },
+    group,
+    sort,
   ]);
   return detailedEntries;
 };
@@ -189,7 +196,7 @@ const get = async (id, type, dateFrom, dateTo, all) => {
     case DURATIONS_TYPE_AVERAGE:
       return getAverage(id, dateFrom, dateTo, all);
     case DURATIONS_TYPE_DETAILED:
-      return getDetailed(id, dateFrom, dateTo);
+      return getDetailed(id, dateFrom, dateTo, all);
   }
 };
 

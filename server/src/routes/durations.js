@@ -16,6 +16,7 @@ const response = entry => ({
       day: entry._id.day,
       month: entry._id.month,
       year: entry._id.year,
+      hour: entry._id.hour,
     },
     domainId: entry._id.domainId,
     time: entry._id.time,
