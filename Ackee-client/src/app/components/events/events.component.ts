@@ -15,8 +15,11 @@ import { BaseComponent } from "../shared/base/base.component";
 })
 export class EventsComponent extends BaseComponent implements OnInit {
   form: FormGroup = new FormGroup({
-    domain: new FormControl("", Validators.required)
+    domain: new FormControl("", Validators.required),
+    numberOfDays: new FormControl(13, Validators.required),
+    radioChoice: new FormControl("all", Validators.required)
   });
+
   domains: AppDomains[];
   loading: boolean;
   data: any;
@@ -52,6 +55,12 @@ export class EventsComponent extends BaseComponent implements OnInit {
   get domain() {
     return this.form.get("domain");
   }
+  get numberOfDays() {
+    return this.form.get("numberOfDays");
+  }
+  get radioChoice() {
+    return this.form.get("radioChoice");
+  }
 
   fetchData() {
     return this.httpService.getEvents(this.domain.value).toPromise();
@@ -59,6 +68,7 @@ export class EventsComponent extends BaseComponent implements OnInit {
 
   async selectChanged(): Promise<void> {
     this.stateService.loading$.next(true);
+    this.data = [];
     this.data = await this.fetchData();
     this.getChartVariables();
     this.stateService.loading$.next(false);
@@ -67,5 +77,16 @@ export class EventsComponent extends BaseComponent implements OnInit {
   getChartVariables(): void {
     this.chartLabels = this.chartsService.createChartEventsLabel(this.data);
     this.chartData = this.chartsService.configureChartEvents(this.data);
+  }
+
+  getHeight(): string {
+    let res: number;
+    if (window.innerWidth < 576)
+      res = Math.round(((window.innerWidth - 32) * 331) / 539);
+    if (window.innerWidth > 575) res = 317;
+    if (window.innerWidth > 767) res = 407;
+    if (window.innerWidth > 991) res = 527;
+    if (window.innerWidth > 1199) res = 627;
+    return `${Math.round(res / 2)}px`;
   }
 }

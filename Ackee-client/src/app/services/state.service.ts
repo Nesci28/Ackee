@@ -14,7 +14,6 @@ export class StateService {
   domains: AppDomains[];
   state$: BehaviorSubject<State> = new BehaviorSubject<State>(State.login);
   loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  numberOfDays$: BehaviorSubject<number> = new BehaviorSubject<number>(13);
   fromDate$: BehaviorSubject<NgbDate> = new BehaviorSubject<NgbDate>("" as any);
   toDate$: BehaviorSubject<NgbDate> = new BehaviorSubject<NgbDate>("" as any);
   start$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
@@ -24,6 +23,7 @@ export class StateService {
   singleDate$: BehaviorSubject<NgbDate> = new BehaviorSubject<NgbDate>(
     "" as any
   );
+  recalculate$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(private calendar: NgbCalendar) {
     this.getFromDate();
@@ -39,11 +39,7 @@ export class StateService {
 
   getFromDate(): void {
     this.fromDate$.next(
-      this.calendar.getNext(
-        this.calendar.getToday(),
-        "d",
-        -this.numberOfDays$.value
-      )
+      this.calendar.getNext(this.calendar.getToday(), "d", -13)
     );
   }
 
@@ -54,22 +50,13 @@ export class StateService {
   }
 
   convertNgbDateToString(date: NgbDate): string {
-    return `${date.month}/${date.day}/${date.year}`;
+    return `${date.year}-${date.month
+      .toString()
+      .padStart(2, "0")}-${date.day.toString().padStart(2, "0")}`;
   }
 
   convertDateToString(date: Date): string {
     return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
-  }
-
-  isBetweenSelectedDates(date: string): boolean {
-    const dateFrom = this.fromDate$.value;
-    const dateTo = this.toDate$.value;
-
-    const from = new Date(`${dateFrom.month}/${dateFrom.day}/${dateFrom.year}`);
-    const to = new Date(`${dateTo.month}/${dateTo.day}/${dateTo.year}`);
-    const check = new Date(date);
-
-    return check > from && check < to;
   }
 
   getHeight(): string {

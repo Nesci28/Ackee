@@ -33,41 +33,7 @@ export class DatePickerRangeComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.stateService.fromDate$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((fromDate: NgbDate) => {
-        this.fromDate = fromDate;
-        if (this.fromDate && this.toDate) {
-          this.calculateDateDifference();
-        }
-      });
-
-    this.stateService.toDate$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((toDate: NgbDate) => {
-        this.toDate = toDate;
-        if (this.fromDate && this.toDate) {
-          this.calculateDateDifference();
-        }
-      });
-
-    this.stateService.datePickerDisable$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((disabled: boolean) => {
-        this.disabled = disabled;
-      });
-  }
-
-  calculateDateDifference(): void {
-    const date1 = new Date(
-      `${this.fromDate.month}/${this.fromDate.day}/${this.fromDate.year}`
-    );
-    const date2 = new Date(
-      `${this.toDate.month}/${this.toDate.day}/${this.toDate.year}`
-    );
-    this.stateService.numberOfDays$.next(
-      (date2.getTime() - date1.getTime()) / (1000 * 3600 * 24)
-    );
+    this.initSubscription();
   }
 
   onDateSelection(date: NgbDate) {
@@ -83,6 +49,7 @@ export class DatePickerRangeComponent extends BaseComponent implements OnInit {
       date.after(this.stateService.fromDate$.value)
     ) {
       this.stateService.toDate$.next(date);
+      this.stateService.recalculate$.next(true);
     } else {
       this.stateService.toDate$.next(null);
       this.stateService.fromDate$.next(date);
@@ -128,5 +95,25 @@ export class DatePickerRangeComponent extends BaseComponent implements OnInit {
     } else if (state === "toDate") {
       this.stateService.toDate$.next(date);
     }
+  }
+
+  initSubscription(): void {
+    this.stateService.datePickerDisable$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((disabled: boolean) => {
+        this.disabled = disabled;
+      });
+
+    this.stateService.fromDate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((fromDate: NgbDate) => {
+        this.fromDate = fromDate;
+      });
+
+    this.stateService.toDate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((toDate: NgbDate) => {
+        this.toDate = toDate;
+      });
   }
 }

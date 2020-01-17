@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
-import { AppDomains } from "../../../models/app.model";
 import { StateService } from "../../../services/state.service";
 import { BaseComponent } from "../base/base.component";
 
@@ -11,12 +10,11 @@ import { BaseComponent } from "../base/base.component";
   styleUrls: ["./graph-bubble.component.scss"]
 })
 export class GraphBubbleComponent extends BaseComponent implements OnInit {
-  @Input() domain: AppDomains;
   @Input() chartData: any;
   @Input() chartLabels: string;
+  @Input() loadingType: string;
 
-  chartOptions: any;
-  domains: AppDomains[];
+  options: any;
   loading: boolean;
 
   constructor(private stateService: StateService) {
@@ -30,8 +28,15 @@ export class GraphBubbleComponent extends BaseComponent implements OnInit {
         this.loading = loading;
       });
 
-    this.chartOptions = {
+    this.createOptions();
+  }
+
+  createOptions(): void {
+    this.options = {
       responsive: true,
+      legend: {
+        display: false
+      },
       drawBorder: false,
       gridLines: {
         drawBorder: false
@@ -44,16 +49,12 @@ export class GraphBubbleComponent extends BaseComponent implements OnInit {
       scales: {
         xAxes: [
           {
-            ticks: {
-              beginAtZero: true,
-              padding: 10,
-              fontSize: 16,
-              max: 23,
-              stepSize: 1
-            },
             gridLines: {
               display: false,
               drawBorder: false
+            },
+            ticks: {
+              display: false
             }
           }
         ],
@@ -88,24 +89,16 @@ export class GraphBubbleComponent extends BaseComponent implements OnInit {
           title: (tooltipItem: any) => {
             const value =
               +tooltipItem[0].value === 0.1 ? "0" : tooltipItem[0].value;
-            return `${value} mins`;
+            return `${value}`;
           },
           label: (tooltipItem: any, data: any) => {
             const index = tooltipItem.index;
-            return data.datasets[0].data[index].r;
+            return `${tooltipItem.label.padStart(2, "0")}:00 - ${
+              data.datasets[0].data[index].r
+            }`;
           }
         }
       }
     };
-
-    this.domains = this.stateService.domains;
-  }
-
-  showGraph(): boolean {
-    return this.chartData.data.length === 0 ? false : true;
-  }
-
-  getHeight(): string {
-    return this.stateService.getHeight();
   }
 }

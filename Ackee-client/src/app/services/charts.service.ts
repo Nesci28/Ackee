@@ -1,8 +1,10 @@
 import { Injectable } from "@angular/core";
-
-import { AppDomains } from "../models/app.model";
-import { StateService } from "./state.service";
 import { NgbDate } from "@ng-bootstrap/ng-bootstrap";
+
+import { AppDomains, GraphData, Graph } from "../models/app.model";
+import { InsideBackendData, BackendData } from "../models/backend.model";
+import { StateService } from "./state.service";
+import { State } from "../models/app.enum";
 
 @Injectable({
   providedIn: "root"
@@ -10,17 +12,17 @@ import { NgbDate } from "@ng-bootstrap/ng-bootstrap";
 export class ChartsService {
   constructor(private stateService: StateService) {}
 
-  createChartBarLabel(numberOfDays: number): string[] {
-    const arr = [];
-    for (let i = numberOfDays; i >= 0; i--) {
-      arr.push(
-        (
-          new Date(new Date().toUTCString().substr(0, 25)).getDate() - i
-        ).toString()
-      );
+  createChartLabelDate(dateFrom: NgbDate, dateTo: NgbDate): string[] {
+    const df = new Date(this.stateService.convertNgbDateToString(dateFrom));
+    const dt = new Date(this.stateService.convertNgbDateToString(dateTo));
+
+    const labels = [];
+    for (let i = df; i <= dt; df.setDate(df.getDate() + 1)) {
+      const newDate = df.toISOString().slice(0, 10);
+      labels.push(newDate);
     }
 
-    return arr;
+    return labels;
   }
 
   createChartPieLabel(data: any): string[] {
@@ -33,7 +35,7 @@ export class ChartsService {
     return arr;
   }
 
-  createChartBubbleOrLineLabel(): string[] {
+  createChartLabelTime(): string[] {
     return [...Array(24).keys()].map(
       (num: any) => `${num.toString().padStart(2, "0")}:00`
     );
@@ -41,6 +43,165 @@ export class ChartsService {
 
   createChartEventsLabel(data: any): string[] {
     return data.data.map((el: any) => Object.keys(el.events));
+  }
+
+  getColorArr(data: any[]): string[] {
+    const colorArr = [];
+    let counter = 0;
+    for (let i = 0; i < data.length; i++) {
+      if (counter === 0) colorArr.push("#9AB0A6");
+      if (counter === 1) colorArr.push("#A4E5FF");
+      if (counter === 2) colorArr.push("#374B42");
+      if (counter === 3) {
+        colorArr.push("#66AEFF");
+        counter = -1;
+      }
+      counter++;
+    }
+    return colorArr;
+  }
+
+  createChartBarBubbleAll(
+    data: any,
+    domains: AppDomains[],
+    labels: string[]
+  ): Graph[] {
+    const chartData: Graph[] = [];
+
+    domains.forEach((domain: AppDomains) => {
+      const tempData = [];
+      for (const label of labels) {
+        tempData.push(JSON.parse(JSON.stringify({ x: label, y: 0, r: 0 })));
+      }
+      const domainId = domain.id;
+      const filteredData = data.filter(
+        (el: any) => el.data.domainId === domainId
+      );
+
+      filteredData.forEach((domainData: BackendData) => {
+        const hour = domainData.data.id.hour;
+        const index = labels.indexOf(`${hour}:00`);
+
+        tempData[index].x = hour;
+        tempData[index].y += domainData.data.time / 1000;
+        tempData[index].r += domainData.data.count;
+      });
+      chartData.push({
+        domainId,
+        data: {
+          data: tempData,
+          backgroundColor: "#6e7373",
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
+      });
+    });
+
+    return chartData;
+  }
+
+  createChartBarLineAll(
+    data: any,
+    domains: AppDomains[],
+    labels: string[]
+  ): Graph[] {
+    const chartData: Graph[] = [
+      {
+        domainId: "combined",
+        data: {
+          data: new Array(labels.length).fill(0),
+          backgroundColor: "#6e7373",
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
+      }
+    ];
+
+    domains.forEach((domain: AppDomains) => {
+      const tempData = new Array(labels.length).fill(0);
+      const domainId = domain.id;
+      const filteredData = data.filter(
+        (el: any) => el.data.domainId === domainId
+      );
+
+      filteredData.forEach((domainData: BackendData) => {
+        if (domainData.data.id.hour) {
+          const hour = domainData.data.id.hour;
+          const index = labels.indexOf(`${hour}:00`);
+          tempData[index] = domainData.data.count;
+          chartData[0].data.data[index] += domainData.data.count;
+        }
+      });
+      chartData.push({
+        domainId,
+        data: {
+          data: tempData,
+          backgroundColor: "#6e7373",
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
+      });
+    });
+
+    return chartData;
+  }
+
+  createChartBarDataAll(
+    data: any,
+    domains: AppDomains[],
+    labels: string[]
+  ): Graph[] {
+    const chartData: Graph[] = [
+      {
+        domainId: "combined",
+        data: {
+          data: new Array(labels.length).fill(0),
+          backgroundColor: "#6e7373",
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
+      }
+    ];
+
+    domains.forEach((domain: AppDomains) => {
+      const tempData = new Array(labels.length).fill(0);
+      const domainId = domain.id;
+      const filteredData = data.filter(
+        (el: any) => el.data.domainId === domainId
+      );
+
+      filteredData.forEach((domainData: BackendData) => {
+        if (domainData.data.id.day) {
+          const date = this.stateService.convertNgbDateToString(
+            domainData.data.id as NgbDate
+          );
+          const index = labels.indexOf(date);
+          tempData[index] =
+            domainData.data.count || domainData.data.average / 1000;
+
+          chartData[0].data.data[index] +=
+            domainData.data.count || domainData.data.average / 1000;
+        }
+      });
+      chartData.push({
+        domainId,
+        data: {
+          data: tempData,
+          backgroundColor: "#6e7373",
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
+      });
+    });
+
+    if (this.stateService.state$.value === State.durations) {
+      chartData[0].data.data.forEach(
+        (value: number, i: number) =>
+          (chartData[0].data.data[i] = Math.round(value / domains.length))
+      );
+    }
+
+    return chartData;
   }
 
   configureChartEvents(data: any): any {
@@ -61,74 +222,6 @@ export class ChartsService {
     });
 
     return chartData;
-  }
-
-  getColorArr(data: any[]): string[] {
-    const colorArr = [];
-    let counter = 0;
-    for (let i = 0; i < data.length; i++) {
-      if (counter === 0) colorArr.push("#9AB0A6");
-      if (counter === 1) colorArr.push("#A4E5FF");
-      if (counter === 2) colorArr.push("#374B42");
-      if (counter === 3) {
-        colorArr.push("#66AEFF");
-        counter = -1;
-      }
-      counter++;
-    }
-    return colorArr;
-  }
-
-  configureChartBar(
-    datas: any,
-    domains: AppDomains[],
-    numberOfDays: number
-  ): any {
-    const chartData = [];
-    const chartOptions = [];
-
-    const datesArray = [];
-    for (let i = numberOfDays; i >= 0; i--) {
-      const date = new Date(new Date().toUTCString().substr(0, 25));
-      date.setDate(date.getDate() - i);
-      datesArray.push(
-        `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
-      );
-    }
-    const tempArr = [];
-    domains.forEach((domain: AppDomains, i: number) => {
-      if (i === 0) {
-        tempArr.push(new Array(numberOfDays + 1).fill(0));
-      }
-      tempArr.push(new Array(numberOfDays + 1).fill(0));
-      const data = datas.data.filter((dt: any) => dt.id === domain.id)[0];
-      data.data.forEach((el: any) => {
-        const index = datesArray.indexOf(
-          `${el.id.year}-${el.id.month}-${el.id.day}`
-        );
-        if (index > -1) {
-          tempArr[0][index] += el.count || el.average / 1000;
-          tempArr[i + 1][index] += el.count || el.average / 1000;
-        }
-      });
-    });
-
-    tempArr.forEach((data: any, i: number) => {
-      chartOptions[i] = this.setChartOptions(numberOfDays);
-      chartData.push([
-        {
-          data: data,
-          backgroundColor: "#6e7373",
-          hoverBackgroundColor: "#73fac8",
-          hoverBorderColor: "#73fac8"
-        }
-      ]);
-    });
-
-    return {
-      chartData,
-      chartOptions
-    };
   }
 
   configureChartPie(datas: any): any {
@@ -244,79 +337,5 @@ export class ChartsService {
       this.stateService.convertDateToString(d1) ===
       this.stateService.convertDateToString(d2)
     );
-  }
-
-  setChartOptions(numberOfDays: number): any {
-    const chartOptions = {
-      responsive: true,
-      drawBorder: false,
-      gridLines: {
-        drawBorder: false
-      },
-      layout: {
-        padding: {
-          top: 60
-        }
-      },
-      scales: {
-        xAxes: [
-          {
-            gridLines: {
-              display: false,
-              drawBorder: false
-            },
-            ticks: {
-              display: false
-            }
-          }
-        ],
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: true,
-              padding: 10,
-              fontSize: 16
-            },
-            gridLines: {
-              display: true,
-              drawBorder: false
-            }
-          }
-        ]
-      },
-      tooltips: {
-        enabled: true,
-        mode: "x-axis",
-        yAlign: "bottom",
-        backgroundColor: "#fff",
-        titleFontSize: 24,
-        titleFontColor: "#333",
-        titleAlign: "center",
-        bodyFontColor: "#333",
-        xPadding: 10,
-        cornerRadius: 0,
-        titleMarginBottom: 0,
-        displayColors: false,
-        callbacks: {
-          title: (tooltipItem: any) => {
-            return +tooltipItem[0].value === 0.1 ? "0" : tooltipItem[0].value;
-          },
-          label: (tooltipItem: any) => {
-            return this.getLabel(numberOfDays, tooltipItem.index);
-          }
-        }
-      }
-    };
-    return chartOptions;
-  }
-
-  getLabel(numberOfDays: number, index: number): string {
-    let date: any = this.stateService.toDate$.value;
-    date = new Date(this.stateService.convertNgbDateToString(date));
-    date.setDate(date.getDate() - Math.abs(numberOfDays - index));
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}-${date
-      .getDate()
-      .toString()
-      .padStart(2, "0")}-${date.getFullYear()}`;
   }
 }

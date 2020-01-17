@@ -76,10 +76,10 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
     this.stateService.loading$.next(true);
 
     // Fetching the Data
-    this.data = await this.httpService.getPagesOrLanguages(
-      this.stateService.domains,
-      this.stateService.state$.value
-    );
+    // this.data = await this.httpService.getPagesOrLanguages(
+    //   this.stateService.domains,
+    //   this.stateService.state$.value
+    // );
     this.domains.forEach((domain: AppDomains, i: number) => {
       this.pages.push({ id: domain.id, data: [] });
       const data = this.data.data.filter((e: any) => e.id === domain.id)[0];

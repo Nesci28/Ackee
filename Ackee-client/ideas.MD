@@ -30,5 +30,23 @@
   - [x] Add to Front-end (show a line? graph)
 - [x] FEATURE - Add event to the Tracker
 - [x] FEATURE - Show event in the Front-end
-  - [ ] BUG - Show hourglass
+  - [x] BUG - Show hourglass
   - [ ] Add Date range selector
+- [ ] FIX - Url dropdown in Pages
+- [ ] BUG - Durations -> .toFixed(2)
+- [ ] BUG - Views.Visited Times -> Main graph height
+- [ ] Date range -> Input -> Put a debounce before calling the backend
+- [ ] Durations:
+  - [ ] Either reworked the average duration to be weighted, or show a multiple bars graphs
+
+---
+
+### Server
+
+- [x] Views - Total -> Create a Unique total and Total total
+- [x] Durations -> Send the arrays of domains IDs and let the server deal with forming a JSON
+- [x] Durations - Detailed -> Group by dates instead of duration time
+- [x] BUG - Languages All should return the domainId
+- [x] BUG - Oses All shoudl return the domainId
+- [x] BUG - Platforms All should return the domainId
+- [x] Durations should send the number of viewers, to calculate a weighted average

@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { AppDomains } from "../../../models/app.model";
-import { BaseComponent } from "../base/base.component";
-import { StateService } from "../../../services/state.service";
+import { Component, Input, OnInit } from "@angular/core";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
+
+import { StateService } from "../../../services/state.service";
+import { BaseComponent } from "../base/base.component";
 
 @Component({
   selector: "app-graph-line",
@@ -10,14 +10,12 @@ import { takeUntil } from "rxjs/internal/operators/takeUntil";
   styleUrls: ["./graph-line.component.scss"]
 })
 export class GraphLineComponent extends BaseComponent implements OnInit {
-  @Input() domain: AppDomains;
   @Input() chartData: any;
   @Input() chartLabels: string;
   @Input() loadingType: string;
 
-  chartOptions: any;
-  domains: AppDomains[];
   loading: boolean;
+  options: any;
 
   constructor(private stateService: StateService) {
     super();
@@ -30,8 +28,16 @@ export class GraphLineComponent extends BaseComponent implements OnInit {
         this.loading = loading;
       });
 
-    this.chartOptions = {
+    this.createOptions();
+    this.createOptions();
+  }
+
+  createOptions(): void {
+    this.options = this.options = {
       responsive: true,
+      legend: {
+        display: false
+      },
       drawBorder: false,
       gridLines: {
         drawBorder: false
@@ -95,22 +101,5 @@ export class GraphLineComponent extends BaseComponent implements OnInit {
         }
       }
     };
-
-    this.domains = this.stateService.domains;
-  }
-
-  showGraph(): boolean {
-    return this.chartData.data.length === 0 ? false : true;
-  }
-
-  getHeight(): string {
-    return this.stateService.getHeight();
-  }
-
-  checkIfChartDataHasData(): boolean {
-    if (this.chartData[0]) {
-      return this.chartData[0].data.filter(el => el !== 0).length > 0;
-    }
-    return false;
   }
 }

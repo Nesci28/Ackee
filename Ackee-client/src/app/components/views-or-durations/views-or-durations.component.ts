@@ -1,14 +1,19 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
+import { Charts, DurationsEnum, State, ViewsEnum } from "../../models/app.enum";
 import { AppDomains } from "../../models/app.model";
-import { Views } from "../../models/backend.model";
+import {
+  Views,
+  BackendData,
+  BackendResponse
+} from "../../models/backend.model";
 import { ChartsService } from "../../services/charts.service";
 import { HttpService } from "../../services/http.service";
 import { StateService } from "../../services/state.service";
 import { BaseComponent } from "../shared/base/base.component";
-import { takeUntil } from "rxjs/internal/operators/takeUntil";
-import { Charts, ViewsEnum, State, DurationsEnum } from "../../models/app.enum";
+import { NgbDate } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: "app-views-or-durations",
@@ -21,19 +26,22 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
   State = State;
   Charts = Charts;
 
+  graphType: Charts;
+
   form: FormGroup = new FormGroup({
-    numberOfDays: new FormControl(13, Validators.required),
     views: new FormControl("1")
   });
 
-  data: Views = { type: "", data: [] };
+  data: BackendData[];
 
   chartTitleName: string[];
   chartLabels: string[] = [];
   chartData: any[] = [];
-  chartOptions: any[] = [];
 
   loading: boolean;
+
+  fromDate: NgbDate;
+  toDate: NgbDate;
 
   constructor(
     private httpService: HttpService,
@@ -44,136 +52,128 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.stateService.loading$.next(true);
     this.stateService.start$.next(true);
     this.stateService.datePickerDisable$.next(false);
     this.domains = this.stateService.domains;
 
-    this.stateService.start$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((start: boolean) => {
-        this.start = start;
-      });
+    this.initSubscriptions();
 
-    this.stateService.numberOfDays$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((numberOfDays: number) => {
-        this.numberOfDays.setValue(numberOfDays);
-        if (!this.start) {
-          this.inputChanged();
-        }
-      });
-
-    this.stateService.singleDate$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(_ => {
-        if (this.views.value !== "1") {
-          this.configureChart();
-        }
-      });
-
-    this.stateService.loading$.next(true);
     this.chartTitleName = ["General"];
     this.domains.forEach(domain => {
       this.chartTitleName.push(domain.title);
     });
+
+    this.chooseWhichGraphType();
     this.createChartLabel();
     await this.getData();
-    this.configureChart();
+    this.createChartData();
 
     this.stateService.loading$.next(false);
   }
 
-  get numberOfDays() {
-    return this.form.get("numberOfDays");
-  }
   get views() {
     return this.form.get("views");
   }
 
-  async inputChanged(): Promise<void> {
-    this.stateService.loading$.next(true);
-    this.configureChart();
-    if (this.showBar() === Charts.bar) {
-      this.stateService.numberOfDays$.next(this.numberOfDays.value);
-      this.stateService.getFromDate();
+  async getData(domainId?: string): Promise<void> {
+    let subType: string;
+    if (this.stateService.state$.value === State.views) {
+      if (this.views.value === "1") subType = ViewsEnum.unique;
+      if (this.views.value === "2") subType = ViewsEnum.total;
+      if (this.views.value === "3") subType = ViewsEnum.time;
+    } else if (this.stateService.state$.value === State.durations) {
+      if (this.views.value === "1") subType = DurationsEnum.average;
+      if (this.views.value === "2") subType = DurationsEnum.detailed;
     }
-    this.createChartLabel();
-    this.stateService.loading$.next(false);
+
+    const dfTemp =
+      subType === ViewsEnum.time || subType === DurationsEnum.detailed
+        ? this.stateService.singleDate$.value
+        : this.stateService.fromDate$.value;
+    const dateFrom = this.stateService.convertNgbDateToString(dfTemp);
+    const dtTemp =
+      subType === ViewsEnum.time || subType === DurationsEnum.detailed
+        ? this.stateService.singleDate$.value
+        : this.stateService.toDate$.value;
+    const dateTo = this.stateService.convertNgbDateToString(dtTemp);
+
+    let data: BackendResponse;
+    if (this.stateService.state$.value === State.views) {
+      data = await this.httpService
+        .getInfo(
+          this.stateService.state$.value,
+          dateFrom,
+          dateTo,
+          subType,
+          domainId
+        )
+        .toPromise();
+    } else if (this.stateService.state$.value === State.durations) {
+      data = await this.httpService
+        .postInfo(
+          this.stateService.state$.value,
+          dateFrom,
+          dateTo,
+          subType,
+          this.domains.map(domain => domain.id)
+        )
+        .toPromise();
+    }
+
+    this.data = data.data;
+  }
+
+  createChartLabel(): void {
+    if (this.graphType === Charts.bar) {
+      this.chartLabels = this.chartsService.createChartLabelDate(
+        this.fromDate,
+        this.toDate
+      );
+    } else if (
+      this.graphType === Charts.line ||
+      this.graphType === Charts.bubble
+    ) {
+      this.chartLabels = this.chartsService.createChartLabelTime();
+    }
+  }
+
+  createChartData(): void {
+    this.chartData = [];
+    if (this.graphType === Charts.bar) {
+      this.chartData = this.chartsService.createChartBarDataAll(
+        this.data,
+        this.domains,
+        this.chartLabels
+      );
+    } else if (this.graphType === Charts.line) {
+      this.chartData = this.chartsService.createChartBarLineAll(
+        this.data,
+        this.domains,
+        this.chartLabels
+      );
+    } else if (this.graphType === Charts.bubble) {
+      this.chartData = this.chartsService.createChartBarBubbleAll(
+        this.data,
+        this.domains,
+        this.chartLabels
+      );
+    }
   }
 
   async selectChanged(): Promise<void> {
     this.stateService.loading$.next(true);
-    await this.getData();
+    this.chooseWhichGraphType();
     this.createChartLabel();
-    this.configureChart();
+    await this.getData();
+    this.createChartData();
     this.stateService.loading$.next(false);
   }
 
-  async getData(): Promise<void> {
-    let type: string;
-    if (this.stateService.state$.value === State.views) {
-      if (this.views.value === "1") type = ViewsEnum.unique;
-      if (this.views.value === "2") type = ViewsEnum.total;
-      if (this.views.value === "3") type = ViewsEnum.time;
-    } else if (this.stateService.state$.value === State.durations) {
-      if (this.views.value === "1") type = DurationsEnum.average;
-      if (this.views.value === "2") type = DurationsEnum.detailed;
-    }
-
-    this.data = await this.httpService.getViewsOrDurations(
-      type,
-      this.stateService.state$.value,
-      this.stateService.domains
-    );
-  }
-
-  createChartLabel(): void {
-    if (this.showBar() === Charts.bar) {
-      this.chartLabels = this.chartsService.createChartBarLabel(
-        this.numberOfDays.value
-      );
-    } else {
-      this.chartLabels = this.chartsService.createChartBubbleOrLineLabel();
-    }
-  }
-
-  configureChart(): void {
-    this.chartData = [];
-    this.chartOptions = [];
-
-    let chartsObj: any;
-    if (this.showBar() === Charts.bar) {
-      chartsObj = this.chartsService.configureChartBar(
-        this.data,
-        this.stateService.domains,
-        this.numberOfDays.value
-      );
-      this.chartData = chartsObj.chartData;
-    } else if (this.showBar() === Charts.bubble) {
-      chartsObj = this.chartsService.configureChartBubble(
-        this.data,
-        this.stateService.singleDate$.value
-      );
-      const tempChartData = chartsObj.chartData;
-      this.domains.forEach((domain: AppDomains) => {
-        const data = tempChartData.filter(
-          (el: any) => el.domainId === domain.id
-        )[0].data;
-        this.chartData.push(data);
-      });
-    } else if (this.showBar() === Charts.line) {
-      chartsObj = this.chartsService.configureChartLine(
-        this.data,
-        this.stateService.singleDate$.value
-      );
-      this.chartData = chartsObj.chartData;
-    }
-
-    this.chartOptions = chartsObj.chartOptions;
-  }
-
   filterChartDataDomain(domainId: string): any {
-    return this.chartData.filter(data => data.domainId === domainId)[0].data;
+    if (!this.loading) {
+      return this.chartData.filter(data => data.domainId === domainId)[0].data;
+    }
   }
 
   moveToMain(index: number): void {
@@ -201,30 +201,81 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
     }
   }
 
-  showBar(): Charts {
+  chooseWhichGraphType(): void {
     if (
       (this.stateService.state$.value === State.views &&
         this.views.value !== "3") ||
       (this.stateService.state$.value === State.durations &&
         this.views.value === "1")
     ) {
-      return Charts.bar;
+      this.graphType = Charts.bar;
     } else if (
       this.stateService.state$.value === State.durations &&
       this.views.value === "2"
     ) {
-      return Charts.bubble;
+      this.graphType = Charts.bubble;
     } else {
-      return Charts.line;
+      this.graphType = Charts.line;
     }
   }
 
   showSpacer(index: number): boolean {
-    if (this.views.value !== "2") return true;
-    else if (this.views.value === "2") {
-      if (window.innerWidth > 991 && index > 1) return true;
-      if (window.innerWidth <= 991 && index > 0) return true;
-      return false;
-    }
+    if (this.graphType !== Charts.bubble) return true;
+    if (
+      this.graphType === Charts.bubble &&
+      window.innerWidth > 991 &&
+      index > 1
+    )
+      return true;
+    if (
+      this.graphType === Charts.bubble &&
+      window.innerWidth <= 991 &&
+      index > 0
+    )
+      return true;
+    return false;
+  }
+
+  initSubscriptions(): void {
+    this.stateService.start$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((e: boolean) => {
+        this.start = e;
+      });
+
+    this.stateService.singleDate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(_ => {
+        if (this.views.value !== "1") this.createChartData();
+      });
+
+    this.stateService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((loading: boolean) => {
+        this.loading = loading;
+      });
+
+    this.stateService.fromDate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((fromDate: NgbDate) => {
+        this.fromDate = fromDate;
+      });
+
+    this.stateService.toDate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((toDate: NgbDate) => {
+        this.toDate = toDate;
+      });
+
+    this.stateService.recalculate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(async (recalculate: boolean) => {
+        if (recalculate) {
+          this.createChartLabel();
+          await this.getData();
+          this.createChartData();
+          this.stateService.recalculate$.next(false);
+        }
+      });
   }
 }

@@ -15,11 +15,11 @@ export class LoadingInCardComponent implements OnInit {
   getHeight(): string {
     let res: number;
     if (window.innerWidth < 576)
-      res = Math.round(((window.innerWidth - 32) * 331) / 541);
-    if (window.innerWidth > 575) res = 314;
-    if (window.innerWidth > 767) res = 404;
-    if (window.innerWidth > 991) res = 524;
-    if (window.innerWidth > 1199) res = 624;
-    return this.type === "main" ? `${res}px` : `${Math.round(res / 2)}px`;
+      res = Math.round((window.innerWidth - 32 - 40) / 2);
+    if (window.innerWidth > 575) res = 233;
+    if (window.innerWidth > 767) res = 323;
+    if (window.innerWidth > 991) res = this.type === "main" ? 443 : 203;
+    if (window.innerWidth > 1199) res = this.type === "main" ? 533 : 248;
+    return `${res}px`;
   }
 }

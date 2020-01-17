@@ -25,6 +25,7 @@ export class DatePickerComponent extends BaseComponent implements OnInit {
 
     this.form.valueChanges.subscribe(_ => {
       this.stateService.singleDate$.next(this.singleDate.value);
+      this.stateService.recalculate$.next(true);
     });
 
     this.stateService.datePickerDisable$

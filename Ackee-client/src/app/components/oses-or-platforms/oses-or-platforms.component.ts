@@ -68,10 +68,7 @@ export class OsesOrPlatformsComponent extends BaseComponent implements OnInit {
     this.stateService.loading$.next(true);
 
     // Fetching the Data
-    this.data = await this.httpService.getOsesOrPlatforms(
-      this.stateService.domains,
-      this.stateService.state$.value
-    );
+    // await this.getData();
 
     this.generateChart();
     this.stateService.loading$.next(false);
@@ -83,6 +80,17 @@ export class OsesOrPlatformsComponent extends BaseComponent implements OnInit {
   get radioChoice() {
     return this.form.get("radioChoice");
   }
+
+  // getData(): any {
+  //   this.data = this.httpService.getInfo(
+  //     type,
+  //     this.stateService.state$.value,
+  //     this.stateService.convertNgbDateToString(
+  //       this.stateService.fromDate$.value
+  //     ),
+  //     this.stateService.convertNgbDateToString(this.stateService.toDate$.value),
+  //     domainId)
+  // }
 
   inputChanged(): void {
     this.stateService.numberOfDays$.next(this.numberOfDays.value);

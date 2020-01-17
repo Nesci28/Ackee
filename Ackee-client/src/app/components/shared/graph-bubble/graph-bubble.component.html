@@ -1,24 +1,13 @@
-<div [style.height]="getHeight()">
-  <div *ngIf="loading">
-    <app-loading-in-card [type]="'sub'"></app-loading-in-card>
-  </div>
-  <div *ngIf="!loading" class="h-100">
-    <div
-      *ngIf="!showGraph()"
-      class="d-flex justify-content-center align-items-center h-100"
+<div>
+  <div *ngIf="!loading && chartData">
+    <canvas
+      *ngIf="chartData.data.length > 0"
+      baseChart
+      [chartType]="'bubble'"
+      [datasets]="[chartData]"
+      [labels]="chartLabels"
+      [options]="options"
     >
-      <i class="fas fa-exclamation-circle fa-10x icon"></i>
-    </div>
-    <div *ngIf="showGraph()">
-      <canvas
-        baseChart
-        [chartType]="'bubble'"
-        [datasets]="[chartData]"
-        [labels]="chartLabels"
-        [options]="chartOptions"
-        [legend]="false"
-      >
-      </canvas>
-    </div>
+    </canvas>
   </div>
 </div>

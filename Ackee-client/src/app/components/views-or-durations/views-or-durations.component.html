@@ -1,89 +1,92 @@
 <div>
-  <form [formGroup]="form" class="mb-3">
-    <div class="w-100 d-flex-responsive justify-content-between mb-1">
-      <input
-        [ngClass]="{ 'visible-no': showBar() !== Charts.bar }"
-        (change)="inputChanged()"
-        type="number"
-        formControlName="numberOfDays"
-        class="mr-3 btn-reponsive btn-reponsive-mb-2"
-      />
-      <select
-        (change)="selectChanged()"
-        formControlName="views"
-        class="btn-reponsive btn-reponsive-mb-3"
-      >
-        <option
-          *ngFor="let option of getOptions(); let i = index"
-          value="{{ i + 1 }}"
-          selected
-          >{{ option }}</option
-        >
-      </select>
-    </div>
+  <!-- Form -->
+  <form
+    [formGroup]="form"
+    class="mb-3 w-100 d-flex-responsive justify-content-between"
+  >
     <app-date-picker-range
       class="range"
-      *ngIf="showBar() === Charts.bar"
+      *ngIf="graphType === Charts.bar"
     ></app-date-picker-range>
     <app-date-picker
-      *ngIf="showBar() === Charts.bubble || showBar() === Charts.line"
+      *ngIf="graphType === Charts.bubble || graphType === Charts.line"
     ></app-date-picker>
+    <select
+      (change)="selectChanged()"
+      formControlName="views"
+      class="btn-reponsive btn-reponsive-mb-3"
+    >
+      <option
+        *ngFor="let option of getOptions(); let i = index"
+        value="{{ i + 1 }}"
+        selected
+        >{{ option }}</option
+      >
+    </select>
   </form>
 
-  <div class="card" *ngIf="showBar() !== Charts.bubble">
+  <!-- Main Graph -->
+  <div class="card" *ngIf="graphType !== Charts.bubble">
     <div class="card-body">
       <h3 class="text-left">
         {{ getTitle() }} -
         {{ chartTitleName[0] }}
       </h3>
+      <div *ngIf="loading">
+        <app-loading-in-card [type]="'main'"></app-loading-in-card>
+      </div>
       <app-graph-bar
-        *ngIf="showBar() === Charts.bar"
+        *ngIf="graphType === Charts.bar && chartData.length > 0"
         [loadingType]="'main'"
-        [chartData]="chartData[0]"
+        [chartData]="filterChartDataDomain('combined')"
         [chartLabels]="chartLabels"
-        [chartOptions]="chartOptions[0]"
       ></app-graph-bar>
       <app-graph-line
-        *ngIf="showBar() === Charts.line"
+        *ngIf="graphType === Charts.line"
         [loadingType]="'main'"
-        [chartData]="chartData[0]"
+        [chartData]="filterChartDataDomain('combined')"
         [chartLabels]="chartLabels"
       ></app-graph-line>
     </div>
   </div>
+
+  <!-- Small Graph -->
   <div class="row">
     <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
       <div *ngIf="showSpacer(i)" class="spacer"></div>
       <div class="card">
         <div class="card-body">
           <h3
-            *ngIf="showBar() !== Charts.bubble"
+            *ngIf="graphType !== Charts.bubble"
             class="text-left pointer text-primary-hover"
             (click)="moveToMain(i)"
           >
             {{ chartTitleName[i + 1] }}
           </h3>
-          <h3 *ngIf="showBar() === Charts.bubble" class="text-left">
+          <h3 *ngIf="graphType === Charts.bubble" class="text-left">
             {{ chartTitleName[i + 1] }}
           </h3>
+          <div *ngIf="loading">
+            <app-loading-in-card [type]="'sub'"></app-loading-in-card>
+          </div>
           <app-graph-bar
-            *ngIf="showBar() === Charts.bar"
+            *ngIf="graphType === Charts.bar && chartData.length > 0"
             [loadingType]="'sub'"
-            [chartData]="chartData[i + 1]"
+            [chartData]="filterChartDataDomain(domain.id)"
             [chartLabels]="chartLabels"
-            [chartOptions]="chartOptions[i + 1]"
           ></app-graph-bar>
-          <app-graph-bubble
-            *ngIf="showBar() === Charts.bubble"
-            [chartData]="chartData[i]"
-            [chartLabels]="chartLabels"
-          ></app-graph-bubble>
           <app-graph-line
-            *ngIf="showBar() === Charts.line"
+            *ngIf="graphType === Charts.line && chartData.length > 0"
             [loadingType]="'sub'"
-            [chartData]="chartData[i + 1]"
+            [chartData]="filterChartDataDomain(domain.id)"
             [chartLabels]="chartLabels"
           ></app-graph-line>
+          <app-graph-bubble
+            *ngIf="graphType === Charts.bubble && chartData.length > 0"
+            [loadingType]="'sub'"
+            [chartData]="filterChartDataDomain(domain.id)"
+            [chartLabels]="chartLabels"
+          ></app-graph-bubble>
         </div>
       </div>
     </div>
