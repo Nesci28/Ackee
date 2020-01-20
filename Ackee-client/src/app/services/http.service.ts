@@ -58,16 +58,19 @@ export class HttpService {
 
   getInfo(
     type: string,
-    dateFrom: string,
-    dateTo: string,
+    dateFrom?: string,
+    dateTo?: string,
     subType?: string,
     domainId?: string
   ): any {
     const url = domainId ? `domains/${domainId}/` : "";
-    const df = dateFrom;
-    let dt: any = new Date(dateTo);
-    dt.setDate(dt.getDate() + 1);
-    dt = dt.toISOString().slice(0, 10);
+    let df: any, dt: any;
+    if (dateFrom && dateTo) {
+      df = dateFrom;
+      dt = new Date(dateTo);
+      dt.setDate(dt.getDate() + 1);
+      dt = dt.toISOString().slice(0, 10);
+    }
 
     const params =
       subType && df && dt

@@ -1,7 +1,6 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
-import { AppDomains } from "../../../models/app.model";
 import { StateService } from "../../../services/state.service";
 import { BaseComponent } from "../base/base.component";
 
@@ -11,16 +10,13 @@ import { BaseComponent } from "../base/base.component";
   styleUrls: ["./graph-table.component.scss"]
 })
 export class GraphTableComponent extends BaseComponent implements OnInit {
-  @Input() domain: AppDomains;
-  @Input() pages: any;
+  @Input() chartData: any;
+  @Input() siteLocation: string;
 
-  domains: AppDomains[];
   loading: boolean;
-  showSpacer: any;
 
   constructor(private stateService: StateService) {
     super();
-    this.showSpacer = stateService.showSpacer;
   }
 
   ngOnInit() {
@@ -29,11 +25,16 @@ export class GraphTableComponent extends BaseComponent implements OnInit {
       .subscribe((loading: boolean) => {
         this.loading = loading;
       });
-
-    this.domains = this.stateService.domains;
   }
 
-  getPagesByDomain(domainId: string): any {
-    return this.pages.filter(lang => lang.id === domainId)[0];
+  getHeight(): string {
+    let res: number;
+    if (window.innerWidth < 576)
+      res = Math.round((window.innerWidth - 32 - 40) / 2);
+    if (window.innerWidth > 575) res = 233;
+    if (window.innerWidth > 767) res = 323;
+    if (window.innerWidth > 991) res = 203;
+    if (window.innerWidth > 1199) res = 248;
+    return `${res}px`;
   }
 }

@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
 import { NgbDate } from "@ng-bootstrap/ng-bootstrap";
 
-import { AppDomains, GraphData, Graph } from "../models/app.model";
-import { InsideBackendData, BackendData } from "../models/backend.model";
-import { StateService } from "./state.service";
 import { State } from "../models/app.enum";
+import { AppDomains, Graph } from "../models/app.model";
+import { BackendData } from "../models/backend.model";
+import { StateService } from "./state.service";
+import { languageList } from "../../assets/list";
 
 @Injectable({
   providedIn: "root"
@@ -42,23 +43,70 @@ export class ChartsService {
   }
 
   createChartEventsLabel(data: any): string[] {
-    return data.data.map((el: any) => Object.keys(el.events));
+    return data.map((el: any) => Object.keys(el.events));
   }
 
-  getColorArr(data: any[]): string[] {
-    const colorArr = [];
-    let counter = 0;
-    for (let i = 0; i < data.length; i++) {
-      if (counter === 0) colorArr.push("#9AB0A6");
-      if (counter === 1) colorArr.push("#A4E5FF");
-      if (counter === 2) colorArr.push("#374B42");
-      if (counter === 3) {
-        colorArr.push("#66AEFF");
-        counter = -1;
+  createChartEventSingle(data: any): any {
+    console.log("data :", data);
+    const chartData = [];
+    const chart = data.map((el: any) => Object.values(el.events));
+
+    chart.forEach((el: any) => {
+      const colorArr = this.getColorArr(el);
+
+      chartData.push([
+        {
+          data: el,
+          backgroundColor: colorArr,
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
+      ]);
+    });
+
+    return chartData;
+  }
+
+  createChartTableAll(data: any, domains: AppDomains[]): any {
+    const chartData: any = [];
+    let siteLocation = "";
+
+    domains.forEach((domain: AppDomains) => {
+      const tempData = [];
+      if (this.stateService.state$.value === State.pages) {
+        const filteredArr = data.filter((el: any) => el.domainId === domain.id);
+        if (filteredArr.length > 0) siteLocation = filteredArr[0].siteLocation;
+        filteredArr.forEach((el: any) => {
+          el.data.forEach((domainData: any) => {
+            tempData.push({
+              page: domainData.page,
+              count: domainData.count
+            });
+          });
+        });
+        chartData.push({
+          domainId: domain.id,
+          siteLocation,
+          data: tempData
+        });
+      } else if (this.stateService.state$.value === State.languages) {
+        const filteredArr = data.filter(
+          (el: any) => el.data.domainId === domain.id
+        );
+        filteredArr.forEach((el: any) => {
+          tempData.push({
+            language: languageList[el.data.id].nativeName,
+            count: el.data.count
+          });
+        });
+        chartData.push({
+          domainId: domain.id,
+          data: tempData
+        });
       }
-      counter++;
-    }
-    return colorArr;
+    });
+
+    return chartData;
   }
 
   createChartBarBubbleAll(
@@ -163,6 +211,8 @@ export class ChartsService {
       }
     ];
 
+    const weightedAvg = {};
+
     domains.forEach((domain: AppDomains) => {
       const tempData = new Array(labels.length).fill(0);
       const domainId = domain.id;
@@ -176,11 +226,21 @@ export class ChartsService {
             domainData.data.id as NgbDate
           );
           const index = labels.indexOf(date);
-          tempData[index] =
-            domainData.data.count || domainData.data.average / 1000;
+          if (this.stateService.state$.value === State.views) {
+            tempData[index] = domainData.data.count;
+            chartData[0].data.data[index] += domainData.data.count;
+          }
 
-          chartData[0].data.data[index] +=
-            domainData.data.count || domainData.data.average / 1000;
+          if (this.stateService.state$.value === State.durations) {
+            tempData[index] = (domainData.data.average / 1000 / 60).toFixed(2);
+            if (!weightedAvg[index]) {
+              weightedAvg[index] = [];
+            }
+            weightedAvg[index].push({
+              count: domainData.data.count,
+              average: Number((domainData.data.average / 1000).toFixed(2))
+            });
+          }
         }
       });
       chartData.push({
@@ -194,148 +254,37 @@ export class ChartsService {
       });
     });
 
-    if (this.stateService.state$.value === State.durations) {
-      chartData[0].data.data.forEach(
-        (value: number, i: number) =>
-          (chartData[0].data.data[i] = Math.round(value / domains.length))
+    for (const index in weightedAvg) {
+      let formula = "";
+      let counter = 0;
+      weightedAvg[index].forEach(
+        (avg: { count: number; average: number }, i: number) => {
+          if (i === 0) formula += `(`;
+          formula += `${avg.average} * ${avg.count}`;
+          if (i !== weightedAvg[index].length - 1) formula += ` + `;
+          counter += avg.count;
+        }
       );
+      formula += `) / ${counter}`;
+      chartData[0].data.data[index] = (eval(formula) / 60).toFixed(2);
     }
 
     return chartData;
   }
 
-  configureChartEvents(data: any): any {
-    const chartData = [];
-    const chart = data.data.map((el: any) => Object.values(el.events));
-
-    chart.forEach((el: any) => {
-      const colorArr = this.getColorArr(el);
-
-      chartData.push([
-        {
-          data: el,
-          backgroundColor: colorArr,
-          hoverBackgroundColor: "#73fac8",
-          hoverBorderColor: "#73fac8"
-        }
-      ]);
-    });
-
-    return chartData;
-  }
-
-  configureChartPie(datas: any): any {
-    const chartData = [];
-    let dataArr = datas.data.map((x: any) => x.count);
-    if (dataArr[0] === undefined) {
-      dataArr = datas.data.map((x: any) => Object.values(x));
-      dataArr = dataArr.filter((x: any) => x[0] !== 0);
+  getColorArr(data: any[]): string[] {
+    const colorArr = [];
+    let counter = 0;
+    for (let i = 0; i < data.length; i++) {
+      if (counter === 0) colorArr.push("#9AB0A6");
+      if (counter === 1) colorArr.push("#A4E5FF");
+      if (counter === 2) colorArr.push("#374B42");
+      if (counter === 3) {
+        colorArr.push("#66AEFF");
+        counter = -1;
+      }
+      counter++;
     }
-    dataArr = dataArr.filter((num: number) => num > 0);
-    const colorArr = this.getColorArr(dataArr);
-    chartData.push([
-      {
-        data: dataArr,
-        backgroundColor: colorArr,
-        hoverBackgroundColor: "#73fac8",
-        hoverBorderColor: "#73fac8"
-      }
-    ]);
-
-    return {
-      chartData
-    };
-  }
-
-  configureChartBubble(data: any, date: NgbDate): any {
-    const chartData = [];
-    const chartOptions = [];
-
-    data.data.forEach((domainData: any) => {
-      const arr = [];
-      domainData.data.forEach((dateData: any) => {
-        const sameDate = dateData.created.filter((el: string) =>
-          this.compareDate(el, date)
-        );
-        if (sameDate.length > 0) {
-          sameDate.forEach((d: string) => {
-            const time = new Date(d).getHours();
-            arr.push({
-              x: time,
-              y: dateData.id / 1000 / 60,
-              r: sameDate.length
-            });
-          });
-        }
-      });
-      chartData.push({
-        domainId: domainData.id,
-        data: {
-          data: arr,
-          backgroundColor: "#6e7373",
-          hoverBackgroundColor: "#73fac8",
-          hoverBorderColor: "#73fac8"
-        }
-      });
-    });
-
-    return {
-      chartData,
-      chartOptions
-    };
-  }
-
-  configureChartLine(data: any, date: NgbDate): any {
-    const tempChartData = [];
-    const chartData = [];
-    const chartOptions = [];
-
-    data.data.forEach((el: any, i: number) => {
-      if (i === 0) {
-        tempChartData[0] = Array(24).fill(0);
-      }
-      const selectedDateData = el.data.filter(
-        (x: any) =>
-          x.id.day === date.day &&
-          x.id.month === date.month &&
-          x.id.year === date.year
-      );
-      if (selectedDateData.length === 0) {
-        tempChartData[i + 1] = Array(24).fill(0);
-      }
-      selectedDateData.forEach((e: any, j: number) => {
-        if (j === 0) {
-          tempChartData[i + 1] = Array(24).fill(0);
-        }
-        tempChartData[0][+e.id.hour] += e.count;
-        tempChartData[i + 1][+e.id.hour] += e.count;
-      });
-    });
-
-    tempChartData.forEach((data: any, i: number) => {
-      chartData.push([
-        {
-          data: data,
-          borderColor: "#73fac8",
-          backgroundColor: "rgba(115, 250, 200, 0.3)",
-          pointBackgroundColor: "#73fac8"
-        }
-      ]);
-    });
-
-    return {
-      chartData,
-      chartOptions
-    };
-  }
-
-  compareDate(date1: string, date2: NgbDate): boolean {
-    const d1 = new Date(date1);
-    const d2 = new Date(this.stateService.convertNgbDateToString(date2));
-
-    return (
-      this.stateService.convertDateToString(d1) ===
-      this.stateService.convertDateToString(d2)
-    );
+    return colorArr;
   }
 }

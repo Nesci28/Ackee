@@ -33,11 +33,11 @@
   - [x] BUG - Show hourglass
   - [ ] Add Date range selector
 - [ ] FIX - Url dropdown in Pages
-- [ ] BUG - Durations -> .toFixed(2)
-- [ ] BUG - Views.Visited Times -> Main graph height
-- [ ] Date range -> Input -> Put a debounce before calling the backend
-- [ ] Durations:
-  - [ ] Either reworked the average duration to be weighted, or show a multiple bars graphs
+- [x] BUG - Durations -> .toFixed(2)
+- [x] BUG - Views.Visited Times -> Main graph height
+- [x] Date range -> Input -> Put a debounce before calling the backend
+- [x] Durations:
+  - [x] Either reworked the average duration to be weighted, or show a multiple bars graphs
 
 ---
 

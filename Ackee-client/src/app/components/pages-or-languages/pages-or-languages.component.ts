@@ -1,10 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { NgbDate } from "@ng-bootstrap/ng-bootstrap";
 import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
 import { RadioChoices, State } from "../../models/app.enum";
 import { AppDomains } from "../../models/app.model";
+import { BackendData, BackendResponse } from "../../models/backend.model";
+import { ChartsService } from "../../services/charts.service";
 import { HttpService } from "../../services/http.service";
 import { StateService } from "../../services/state.service";
 import { BaseComponent } from "../shared/base/base.component";
@@ -18,179 +19,169 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
   State = State;
   domains: AppDomains[] = [];
   start: boolean = true;
-  showSpacer: any;
   disabled: boolean;
+  loading: boolean;
+  state: State;
 
   pages = [];
-  data: any = { type: "", data: [] };
   urls: any[] = [];
   originalUrls: any[] = [];
 
+  data: BackendData[];
+  chartData: any = [];
+
   form: FormGroup = new FormGroup({
-    subUrl: new FormControl("All"),
-    numberOfDays: new FormControl(13, Validators.required),
+    subUrl: new FormControl("/"),
     radioChoice: new FormControl("all", Validators.required)
   });
 
   constructor(
     private httpService: HttpService,
-    private stateService: StateService
+    private stateService: StateService,
+    private chartsService: ChartsService
   ) {
     super();
-    this.showSpacer = stateService.showSpacer;
   }
 
   async ngOnInit() {
-    this.domains = this.stateService.domains;
+    this.stateService.loading$.next(true);
     this.stateService.start$.next(true);
     this.stateService.datePickerDisable$.next(true);
+    this.domains = this.stateService.domains;
+    this.state = this.stateService.state$.value;
 
-    this.stateService.start$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((start: boolean) => {
-        this.start = start;
-      });
+    this.initSubscriptions();
 
-    this.stateService.numberOfDays$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((numberOfDays: number) => {
-        if (!this.start) {
-          this.numberOfDays.setValue(numberOfDays);
-          this.inputChanged(true);
-        }
-      });
-
-    this.stateService.datePickerDisable$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((disabled: boolean) => {
-        this.disabled = disabled;
-        if (disabled) {
-          this.numberOfDays.setValue("");
-          this.numberOfDays.disable();
-        } else {
-          this.numberOfDays.setValue(this.stateService.numberOfDays$.value);
-          this.numberOfDays.enable();
-        }
-      });
-
-    this.stateService.loading$.next(true);
-
-    // Fetching the Data
-    // this.data = await this.httpService.getPagesOrLanguages(
-    //   this.stateService.domains,
-    //   this.stateService.state$.value
-    // );
-    this.domains.forEach((domain: AppDomains, i: number) => {
-      this.pages.push({ id: domain.id, data: [] });
-      const data = this.data.data.filter((e: any) => e.id === domain.id)[0];
-      data.data.forEach((page: any) => {
-        this.pages[i].data.push({
-          name: page.data.id,
-          count: page.data.count
-        });
-      });
-    });
-    // Setting up the sup Domains List
+    await this.getData();
+    this.createChartData();
     this.generateSubUrls();
+
     this.stateService.loading$.next(false);
   }
 
   get subUrl() {
     return this.form.get("subUrl");
   }
-  get numberOfDays() {
-    return this.form.get("numberOfDays");
-  }
   get radioChoice() {
     return this.form.get("radioChoice");
   }
 
-  inputChanged(state?: boolean): void {
-    if (!state) {
-      this.stateService.numberOfDays$.next(this.numberOfDays.value);
-      this.stateService.getFromDate();
+  async getData(): Promise<void> {
+    let data: BackendResponse;
+    if (this.radioChoice.value === RadioChoices.all) {
+      data = await this.httpService
+        .getInfo(this.stateService.state$.value)
+        .toPromise();
     }
-    this.generateTableData();
-    this.generateSubUrls();
+    if (this.radioChoice.value === RadioChoices.selected) {
+      const tempFrom = this.stateService.convertNgbDateToString(
+        this.stateService.fromDate$.value
+      );
+      const tempTo = this.stateService.convertNgbDateToString(
+        this.stateService.toDate$.value
+      );
+      data = await this.httpService
+        .getInfo(this.stateService.state$.value, tempFrom, tempTo)
+        .toPromise();
+    }
+
+    this.data = data.data;
   }
 
-  radioChoiceChanged() {
+  createChartData(): void {
+    this.chartData = [];
+    this.chartData = this.chartsService.createChartTableAll(
+      this.data,
+      this.domains
+    );
+  }
+
+  filterChartDataDomain(domainId: string): any {
+    if (!this.loading) {
+      return this.chartData.filter(data => data.domainId === domainId)[0];
+    }
+  }
+
+  async radioChoiceChanged() {
+    this.stateService.loading$.next(true);
+    this.chartData = [];
     if (this.radioChoice.value === RadioChoices.all) {
       this.stateService.datePickerDisable$.next(true);
     } else if (this.radioChoice.value === RadioChoices.selected) {
       this.stateService.datePickerDisable$.next(false);
     }
-    this.generateTableData();
+    await this.getData();
+    this.createChartData();
     this.generateSubUrls();
+    this.stateService.loading$.next(false);
   }
 
   generateSubUrls(): void {
-    this.urls = [];
-    this.pages.forEach((page: any, i: number) => {
-      page.data.forEach((e: any) => {
-        if (this.stateService.state$.value === State.pages) {
-          if (!this.urls[i]) {
-            this.urls[i] = new Set();
-          }
-          this.urls[i].add("All");
-          const url1 = e.name.split("//").pop();
-          const url2 = url1.split("/").pop();
-          if (url1 !== url2) {
-            this.urls[i].add(url2);
-          }
-        }
+    if (this.stateService.state$.value === State.pages) {
+      this.urls = [];
+      this.chartData.forEach((domainData: any) => {
+        let urls = new Set();
+        urls.add("/");
+        domainData.data.forEach((data: any) => {
+          const arr = data.page.split("/").filter(String);
+          if (arr.length > 0) urls.add([...arr]);
+        });
+
+        this.urls.push([...urls]);
       });
-    });
+    }
   }
 
   selectChanged(index: number): void {
-    if (this.subUrl.value !== "All") {
+    if (this.subUrl.value !== "/") {
       if (!this.originalUrls[index]) {
         this.originalUrls[index] = JSON.parse(
-          JSON.stringify(this.pages[index].data)
+          JSON.stringify(this.chartData[index].data)
         );
       }
-      this.pages[index].data = this.pages[index].data.filter((el: any) =>
-        el.name.includes(this.subUrl.value)
-      );
+      this.chartData[index].data = this.chartData[
+        index
+      ].data.filter((el: any) => el.page.includes(this.subUrl.value));
     } else {
-      this.pages[index].data = JSON.parse(
+      this.chartData[index].data = JSON.parse(
         JSON.stringify(this.originalUrls[index])
       );
     }
   }
 
-  generateTableData(): void {
-    this.pages = [];
-    this.domains.forEach((domain: AppDomains, i: number) => {
-      this.pages.push({ id: domain.id, data: [] });
-      const data = this.data.data.filter((e: any) => e.id === domain.id)[0];
-      data.data.forEach((page: any) => {
-        let count: number = 0;
-        if (this.radioChoice.value === RadioChoices.selected) {
-          page.data.created.forEach((createdDate: string) => {
-            let date: any = new Date(createdDate);
-            date = `${date.getMonth() +
-              1}/${date.getDate()}/${date.getFullYear()}`;
-            if (this.stateService.isBetweenSelectedDates(date)) {
-              count += 1;
-            }
-          });
-        }
+  showSpacer(index: number): boolean {
+    if (window.innerWidth > 991 && index > 1) return true;
+    if (window.innerWidth <= 991 && index > 0) return true;
+    return false;
+  }
 
-        if (
-          this.radioChoice.value === RadioChoices.all ||
-          (this.radioChoice.value === RadioChoices.selected && count > 0)
-        ) {
-          this.pages[i].data.push({
-            name: page.data.id,
-            count:
-              this.radioChoice.value === RadioChoices.all
-                ? page.data.count
-                : count
-          });
+  initSubscriptions(): void {
+    this.stateService.start$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((start: boolean) => {
+        this.start = start;
+      });
+
+    this.stateService.datePickerDisable$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((disabled: boolean) => {
+        this.disabled = disabled;
+      });
+
+    this.stateService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((loading: boolean) => {
+        this.loading = loading;
+      });
+
+    this.stateService.recalculate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(async (recalculate: boolean) => {
+        if (recalculate) {
+          await this.getData();
+          this.createChartData();
+          this.stateService.recalculate$.next(false);
         }
       });
-    });
   }
 }

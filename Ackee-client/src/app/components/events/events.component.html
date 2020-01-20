@@ -1,64 +1,47 @@
-<form [formGroup]="form" class="mb-3">
-  <select
-    class="w-100 mb-2"
-    (change)="selectChanged()"
-    formControlName="domain"
-  >
-    <option *ngFor="let domain of domains" value="{{ domain.id }}">{{
-      domain.title
-    }}</option>
-  </select>
-  <div class="w-100 d-flex-responsive mb-1">
-    <input
-      (change)="inputChanged()"
-      type="number"
-      formControlName="numberOfDays"
-      class="mr-2 btn-reponsive btn-reponsive-mb-2"
-    />
-    <div
-      class="btn-group btn-group-toggle btn-reponsive-mb-3"
-      ngbRadioGroup
-      name="radioBasic"
-      formControlName="radioChoice"
-      (change)="radioChoiceChanged()"
+<div>
+  <form [formGroup]="form" class="mb-3 w-100">
+    <select
+      class="w-100 mb-2"
+      (change)="selectChanged()"
+      formControlName="domain"
     >
-      <label ngbButtonLabel class="btn-outline-secondary">
-        <input ngbButton type="radio" value="selected" />Selected Dates
-      </label>
-      <label ngbButtonLabel class="btn-outline-secondary">
-        <input ngbButton type="radio" value="all" />All Time
-      </label>
-    </div>
-  </div>
-  <app-date-picker-range></app-date-picker-range>
-</form>
-
-<div *ngIf="loading">
-  <div class="row">
-    <div class="card m-auto col-lg-6">
-      <app-loading-in-card></app-loading-in-card>
-    </div>
-  </div>
-</div>
-<div *ngIf="!loading && data">
-  <div *ngIf="data.data.length === 0" class="row">
-    <div class="card m-auto col-lg-6" [style.height]="getHeight()">
-      <div class="card-body d-flex justify-content-center align-items-center">
-        <i class="fas fa-exclamation-circle fa-10x icon"></i>
+      <option *ngFor="let domain of domains" value="{{ domain.id }}">{{
+        domain.title
+      }}</option>
+    </select>
+    <div class="w-100 d-flex-responsive mb-1">
+      <div
+        class="btn-group btn-group-toggle"
+        ngbRadioGroup
+        name="radioBasic"
+        formControlName="radioChoice"
+        (change)="radioChoiceChanged()"
+      >
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="selected" />Selected Dates
+        </label>
+        <label ngbButtonLabel class="btn-outline-secondary">
+          <input ngbButton type="radio" value="all" />All Time
+        </label>
       </div>
     </div>
-  </div>
-  <div *ngIf="data.data.length > 0" class="row">
-    <div *ngFor="let el of data.data; let i = index" class="col-lg-6">
+    <app-date-picker-range></app-date-picker-range>
+  </form>
+
+  <div class="row">
+    <div *ngFor="let el of data; let i = index" class="col-lg-6">
       <div *ngIf="showSpacer(i)" class="spacer"></div>
       <div class="card">
         <div class="card-body">
           <h3 class="text-left">
             {{ el.groupName }}
           </h3>
+          <div *ngIf="loading">
+            <app-loading-in-card [type]="'sub'"></app-loading-in-card>
+          </div>
           <app-graph-pie
-            [chartData]="chartData[i]"
-            [chartLabels]="chartLabels[i]"
+            [chartData]="filterChartDataDomain().data"
+            [chartLabels]="chartLabels"
           ></app-graph-pie>
         </div>
       </div>

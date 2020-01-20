@@ -16,6 +16,7 @@ export class GraphLineComponent extends BaseComponent implements OnInit {
 
   loading: boolean;
   options: any;
+  colors: any;
 
   constructor(private stateService: StateService) {
     super();
@@ -29,11 +30,24 @@ export class GraphLineComponent extends BaseComponent implements OnInit {
       });
 
     this.createOptions();
-    this.createOptions();
+    this.createColors();
+  }
+
+  createColors(): void {
+    this.colors = [
+      {
+        backgroundColor: "rgba(115,250,200,0.2)",
+        borderColor: "#73fac8",
+        pointBackgroundColor: "rgba(148,159,177,1)",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "#73fac8"
+      }
+    ];
   }
 
   createOptions(): void {
-    this.options = this.options = {
+    this.options = {
       responsive: true,
       legend: {
         display: false

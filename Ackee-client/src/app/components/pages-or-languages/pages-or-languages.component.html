@@ -1,26 +1,18 @@
 <div>
-  <form [formGroup]="form" class="mb-3">
-    <div class="w-100 d-flex-responsive mb-1">
-      <input
-        (change)="inputChanged()"
-        type="number"
-        formControlName="numberOfDays"
-        class="mr-2 btn-reponsive btn-reponsive-mb-2"
-      />
-      <div
-        class="btn-group btn-group-toggle btn-reponsive-mb-3"
-        ngbRadioGroup
-        name="radioBasic"
-        formControlName="radioChoice"
-        (change)="radioChoiceChanged()"
-      >
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="selected" />Selected Dates
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="all" />All Time
-        </label>
-      </div>
+  <form [formGroup]="form" class="mb-3 w-100">
+    <div
+      class="btn-group btn-group-toggle mb-1"
+      ngbRadioGroup
+      name="radioBasic"
+      formControlName="radioChoice"
+      (change)="radioChoiceChanged()"
+    >
+      <label ngbButtonLabel class="btn-outline-secondary">
+        <input ngbButton type="radio" value="selected" />Selected Dates
+      </label>
+      <label ngbButtonLabel class="btn-outline-secondary">
+        <input ngbButton type="radio" value="all" />All Time
+      </label>
     </div>
     <app-date-picker-range></app-date-picker-range>
   </form>
@@ -29,7 +21,7 @@
     <div *ngFor="let domain of domains; let i = index" class="col-lg-6">
       <div *ngIf="showSpacer(i)" class="spacer"></div>
       <div class="card">
-        <div class="card-body" style="height: 420px; max-height: 420px;">
+        <div class="card-body">
           <form
             [formGroup]="form"
             class="d-flex flex-wrap justify-content-between"
@@ -39,7 +31,7 @@
             </h3>
             <select
               (change)="selectChanged(i)"
-              *ngIf="State.pages && urls[i]"
+              *ngIf="state === State.pages && urls[i]"
               formControlName="subUrl"
             >
               <option *ngFor="let url of urls[i]" value="{{ url }}">{{
@@ -47,7 +39,14 @@
               }}</option>
             </select>
           </form>
-          <app-graph-table [domain]="domain" [pages]="pages"></app-graph-table>
+          <div *ngIf="loading">
+            <app-loading-in-card [type]="'sub'"></app-loading-in-card>
+          </div>
+          <app-graph-table
+            *ngIf="chartData.length > 0"
+            [chartData]="filterChartDataDomain(domain.id).data"
+            [siteLocation]="filterChartDataDomain(domain.id).siteLocation"
+          ></app-graph-table>
         </div>
       </div>
     </div>

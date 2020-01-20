@@ -60,7 +60,7 @@ export class OsesOrPlatformsComponent extends BaseComponent implements OnInit {
           this.numberOfDays.setValue("");
           this.numberOfDays.disable();
         } else {
-          this.numberOfDays.setValue(this.stateService.numberOfDays$.value);
+          // this.numberOfDays.setValue(this.stateService.numberOfDays$.value);
           this.numberOfDays.enable();
         }
       });
@@ -93,7 +93,7 @@ export class OsesOrPlatformsComponent extends BaseComponent implements OnInit {
   // }
 
   inputChanged(): void {
-    this.stateService.numberOfDays$.next(this.numberOfDays.value);
+    // this.stateService.numberOfDays$.next(this.numberOfDays.value);
     this.stateService.getFromDate();
     this.generateChart();
   }
@@ -122,9 +122,9 @@ export class OsesOrPlatformsComponent extends BaseComponent implements OnInit {
             let date: any = new Date(createdDate);
             date = `${date.getMonth() +
               1}/${date.getDate()}/${date.getFullYear()}`;
-            if (this.stateService.isBetweenSelectedDates(date)) {
-              count += 1;
-            }
+            // if (this.stateService.isBetweenSelectedDates(date)) {
+            //   count += 1;
+            // }
           });
         }
 
