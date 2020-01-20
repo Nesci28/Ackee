@@ -80,6 +80,9 @@ const schema = new mongoose.Schema({
   eventsTriggered: {
     type: Array,
   },
+  pagesVisited: {
+    type: Array,
+  },
   created: {
     type: Date,
     required: true,

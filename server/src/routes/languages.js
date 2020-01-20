@@ -5,7 +5,8 @@ const languages = require('../database/languages');
 const response = entry => ({
   type: 'language',
   data: {
-    id: entry._id,
+    id: entry._id.site,
+    domainId: entry._id.domainId,
     count: entry.count,
   },
 });

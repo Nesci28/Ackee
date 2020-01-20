@@ -1,6 +1,7 @@
 import platform from 'platform';
 
 let eventsTriggered = [];
+let pagesVisited = [];
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -79,7 +80,8 @@ export const attributes = function(detailed = false) {
     browserVersion: platform.version,
     browserWidth: document.documentElement.clientWidth || window.outerWidth,
     browserHeight: document.documentElement.clientHeight || window.outerHeight,
-    eventsTriggered: eventsTriggered,
+    eventsTriggered,
+    pagesVisited,
   };
 
   return polish({
@@ -171,12 +173,13 @@ const record = function(server, domainId, attrs, opts, active) {
       send(
         'PATCH',
         endpoint(server, domainId, recordId),
-        { eventsTriggered: eventsTriggered },
+        { eventsTriggered, pagesVisited },
         err => {
           if (err != null) return console.error(err);
         },
       );
       eventsTriggered = [];
+      pagesVisited = [];
     }, 15000);
   });
 };
@@ -229,6 +232,10 @@ export const create = function({ server, domainId }, opts) {
 // Others
 export const click = attr => {
   eventsTriggered.push(attr);
+};
+
+export const visit = attr => {
+  pagesVisited.push(attr);
 };
 
 // Only run Ackee automatically when executed in a browser environment

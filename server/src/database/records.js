@@ -7,8 +7,8 @@ const add = async data => {
   return Record.create(data);
 };
 
-const update = async (id, eventsTriggered) => {
-  return runUpdate(Record, id, eventsTriggered);
+const update = async (id, data) => {
+  return runUpdate(Record, id, data);
 };
 
 const anonymize = async (clientId, ignoreId) => {

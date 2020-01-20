@@ -28,6 +28,7 @@ const response = entry => ({
     browserWidth: entry.browserWidth,
     browserHeight: entry.browserHeight,
     eventsTriggered: entry.eventsTriggered,
+    pagesVisited: entry.pagesVisited,
     created: entry.created,
     updated: entry.updated,
   },
@@ -93,9 +94,8 @@ const update = async req => {
   const { recordId } = req.params;
 
   let entry;
-
   try {
-    entry = await records.update(recordId, data.eventsTriggered);
+    entry = await records.update(recordId, data);
   } catch (err) {
     if (err.name === 'ValidationError') {
       throw createError(400, messages(err.errors), err);

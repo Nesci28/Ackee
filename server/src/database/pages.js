@@ -4,7 +4,9 @@ const Record = require('../schemas/Record');
 
 const getTop = async (id, dateFrom, dateTo) => {
   const match = {
-    $match: {},
+    $match: {
+      'pagesVisited.0': { $type: 'string' },
+    },
   };
   if (id !== undefined) {
     match.$match.domainId = id;
@@ -18,27 +20,25 @@ const getTop = async (id, dateFrom, dateTo) => {
 
   const group = {
     $group: {
-      _id: {
-        siteLocation: '$siteLocation',
-      },
-      count: {
-        $sum: 1,
-      },
+      _id: '',
     },
   };
   if (!id) {
-    group.$group._id.domainId = '$domainId';
+    group.$group._id = '$domainId';
   }
 
-  return Record.aggregate([
-    match,
-    group,
-    {
-      $sort: {
-        count: -1,
-      },
+  const project = {
+    $project: {
+      _id: 0,
+      pagesVisited: 1,
+      siteLocation: 1,
     },
-  ]);
+  };
+  if (!id) {
+    project.$project.domainId = 1;
+  }
+
+  return Record.aggregate([match, project]);
 };
 
 const get = async (id, dateFrom, dateTo) => {
