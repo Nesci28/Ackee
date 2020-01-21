@@ -28,13 +28,6 @@ export class GraphTableComponent extends BaseComponent implements OnInit {
   }
 
   getHeight(): string {
-    let res: number;
-    if (window.innerWidth < 576)
-      res = Math.round((window.innerWidth - 32 - 40) / 2);
-    if (window.innerWidth > 575) res = 233;
-    if (window.innerWidth > 767) res = 323;
-    if (window.innerWidth > 991) res = 203;
-    if (window.innerWidth > 1199) res = 248;
-    return `${res}px`;
+    return this.stateService.getHeight();
   }
 }

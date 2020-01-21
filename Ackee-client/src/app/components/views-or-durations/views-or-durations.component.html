@@ -2,7 +2,7 @@
   <!-- Form -->
   <form
     [formGroup]="form"
-    class="mb-3 w-100 d-flex-responsive justify-content-between"
+    class="mb-3 w-100 d-flex-responsive justify-content-between flex-wrap"
   >
     <app-date-picker-range
       class="range"
@@ -29,8 +29,8 @@
   <div class="card" *ngIf="graphType !== Charts.bubble">
     <div class="card-body">
       <h3 class="text-left">
-        {{ getTitle() }} -
-        {{ chartTitleName[0] }}
+        {{ getTitle() | titlecase }} -
+        {{ chartTitleName[0] | titlecase }}
       </h3>
       <div *ngIf="loading">
         <app-loading-in-card [type]="'main'"></app-loading-in-card>
@@ -61,10 +61,10 @@
             class="text-left pointer text-primary-hover"
             (click)="moveToMain(i)"
           >
-            {{ chartTitleName[i + 1] }}
+            {{ chartTitleName[i + 1] | titlecase }}
           </h3>
           <h3 *ngIf="graphType === Charts.bubble" class="text-left">
-            {{ chartTitleName[i + 1] }}
+            {{ chartTitleName[i + 1] | titlecase }}
           </h3>
           <div *ngIf="loading">
             <app-loading-in-card [type]="'sub'"></app-loading-in-card>

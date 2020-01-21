@@ -55,14 +55,10 @@ export class StateService {
       .padStart(2, "0")}-${date.day.toString().padStart(2, "0")}`;
   }
 
-  convertDateToString(date: Date): string {
-    return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
-  }
-
   getHeight(): string {
     let res: number;
     if (window.innerWidth < 576)
-      res = Math.round(((window.innerWidth - 73) * 250) / 501);
+      res = Math.round((window.innerWidth - 32 - 40) / 2);
     if (window.innerWidth > 575) res = 233;
     if (window.innerWidth > 767) res = 323;
     if (window.innerWidth > 991) res = 203;

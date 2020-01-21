@@ -29,19 +29,36 @@
   </form>
 
   <div class="row">
+    <div *ngIf="data.length === 0" class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="text-left">
+            {{ getDomainTitle() | titlecase }}
+          </h3>
+          <div *ngIf="loading">
+            <app-loading-in-card [type]="'sub'"></app-loading-in-card>
+          </div>
+          <div *ngIf="!loading">
+            <app-graph-pie *ngIf="!loading"></app-graph-pie>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div *ngFor="let el of data; let i = index" class="col-lg-6">
       <div *ngIf="showSpacer(i)" class="spacer"></div>
       <div class="card">
         <div class="card-body">
           <h3 class="text-left">
-            {{ el.groupName }}
+            {{ el.groupName || "Loading..." | titlecase }}
           </h3>
           <div *ngIf="loading">
             <app-loading-in-card [type]="'sub'"></app-loading-in-card>
           </div>
           <app-graph-pie
-            [chartData]="filterChartDataDomain().data"
-            [chartLabels]="chartLabels"
+            *ngIf="!loading && chartData"
+            [chartData]="chartData[i]"
+            [chartLabels]="chartLabels[i]"
           ></app-graph-pie>
         </div>
       </div>

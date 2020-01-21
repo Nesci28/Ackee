@@ -44,7 +44,7 @@ export class EventsComponent extends BaseComponent implements OnInit {
 
     await this.getData();
     this.chartLabels = this.chartsService.createChartEventsLabel(this.data);
-    this.createChartData();
+    this.chartData = this.chartsService.createChartEventSingle(this.data);
     this.stateService.loading$.next(false);
   }
 
@@ -83,10 +83,6 @@ export class EventsComponent extends BaseComponent implements OnInit {
     this.data = data.data;
   }
 
-  createChartData(): void {
-    this.chartData = this.chartsService.createChartEventSingle(this.data);
-  }
-
   filterChartDataDomain(): any {
     if (!this.loading) {
       return this.chartData.filter(
@@ -99,16 +95,30 @@ export class EventsComponent extends BaseComponent implements OnInit {
     this.stateService.loading$.next(true);
     await this.getData();
     this.chartLabels = this.chartsService.createChartEventsLabel(this.data);
-    this.createChartData();
+    this.chartData = this.chartsService.createChartEventSingle(this.data);
     this.stateService.loading$.next(false);
   }
 
-  radioChoiceChanged(): void {}
+  async radioChoiceChanged(): Promise<void> {
+    this.stateService.loading$.next(true);
+    if (this.radioChoice.value === RadioChoices.all) {
+      this.stateService.datePickerDisable$.next(true);
+    } else if (this.radioChoice.value === RadioChoices.selected) {
+      this.stateService.datePickerDisable$.next(false);
+    }
+    await this.getData();
+    this.chartLabels = this.chartsService.createChartEventsLabel(this.data);
+    this.chartData = this.chartsService.createChartEventSingle(this.data);
+    this.stateService.loading$.next(false);
+  }
 
   showSpacer(index: number): boolean {
-    if (window.innerWidth > 991 && index > 1) return true;
-    if (window.innerWidth <= 991 && index > 0) return true;
-    return false;
+    return this.stateService.showSpacer(index);
+  }
+
+  getDomainTitle(): string {
+    return this.domains.filter(domain => domain.id === this.domain.value)[0]
+      .title;
   }
 
   initSubscriptions(): void {
@@ -122,9 +132,14 @@ export class EventsComponent extends BaseComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe(async (recalculate: boolean) => {
         if (recalculate) {
+          this.stateService.loading$.next(true);
           await this.getData();
-          this.createChartData();
+          this.chartLabels = this.chartsService.createChartEventsLabel(
+            this.data
+          );
+          this.chartData = this.chartsService.createChartEventSingle(this.data);
           this.stateService.recalculate$.next(false);
+          this.stateService.loading$.next(false);
         }
       });
   }

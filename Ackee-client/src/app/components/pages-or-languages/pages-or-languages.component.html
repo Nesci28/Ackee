@@ -27,11 +27,11 @@
             class="d-flex flex-wrap justify-content-between"
           >
             <h3 class="text-left">
-              {{ domain.title }}
+              {{ domain.title | titlecase }}
             </h3>
             <select
+              *ngIf="state === State.pages && urls[i]?.length > 1"
               (change)="selectChanged(i)"
-              *ngIf="state === State.pages && urls[i]"
               formControlName="subUrl"
             >
               <option *ngFor="let url of urls[i]" value="{{ url }}">{{

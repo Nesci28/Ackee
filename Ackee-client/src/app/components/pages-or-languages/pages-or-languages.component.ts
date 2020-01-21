@@ -178,9 +178,11 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe(async (recalculate: boolean) => {
         if (recalculate) {
+          this.stateService.loading$.next(true);
           await this.getData();
           this.createChartData();
           this.stateService.recalculate$.next(false);
+          this.stateService.loading$.next(false);
         }
       });
   }

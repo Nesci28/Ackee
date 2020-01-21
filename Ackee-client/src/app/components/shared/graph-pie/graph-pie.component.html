@@ -1,7 +1,4 @@
 <div [style.height]="getHeight()">
-  <div *ngIf="loading">
-    <app-loading-in-card [type]="'sub'"></app-loading-in-card>
-  </div>
   <div *ngIf="!loading" class="h-100">
     <div
       *ngIf="!showGraph()"

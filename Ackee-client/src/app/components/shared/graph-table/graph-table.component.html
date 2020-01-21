@@ -1,11 +1,24 @@
 <div [style.height]="getHeight()">
-  <div *ngIf="!loading && chartData">
-    <div *ngFor="let page of chartData; let last = last" class="mt-1">
-      <div [ngClass]="{ 'border-bottom border-secondary': !last }">
-        <span class="badge badge-dark lead text-primary mb-1"
-          >{{ page.count }}x</span
-        >
-        <span class="ml-2 text-secondary">{{ siteLocation }}{{ page.page || page.language }}</span>
+  <div *ngIf="!loading && chartData" class="h-100">
+    <div
+      *ngIf="chartData.length === 0"
+      class="d-flex justify-content-center align-items-center h-100"
+    >
+      <i class="fas fa-exclamation-circle fa-10x icon"></i>
+    </div>
+    <div *ngIf="chartData.length > 0">
+      <div
+        *ngFor="let page of chartData; let first = first; let last = last"
+        [ngClass]="{ 'mt-1': !first }"
+      >
+        <div [ngClass]="{ 'border-bottom border-secondary': !last }">
+          <span class="badge badge-dark lead text-primary mb-1"
+            >{{ page.count }}x</span
+          >
+          <span class="ml-2 text-secondary"
+            >{{ siteLocation }}{{ page.page || page.language }}</span
+          >
+        </div>
       </div>
     </div>
   </div>

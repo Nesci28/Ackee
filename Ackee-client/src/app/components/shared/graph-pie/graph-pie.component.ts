@@ -1,10 +1,8 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
+import { takeUntil } from "rxjs/internal/operators/takeUntil";
 
 import { StateService } from "../../../services/state.service";
-import { AppDomains } from "../../../models/app.model";
-import { takeUntil } from "rxjs/internal/operators/takeUntil";
 import { BaseComponent } from "../base/base.component";
-import { Charts } from "../../../models/app.enum";
 
 @Component({
   selector: "app-graph-pie",
@@ -12,34 +10,12 @@ import { Charts } from "../../../models/app.enum";
   styleUrls: ["./graph-pie.component.scss"]
 })
 export class GraphPieComponent extends BaseComponent implements OnInit {
-  @Input() domain: AppDomains;
   @Input() chartData: any;
   @Input() chartLabels: string;
+  @Input() loadingType: boolean;
 
-  domains: AppDomains[];
   loading: boolean;
-  options = {
-    responsive: true,
-    tooltips: {
-      enabled: true,
-      mode: "x-axis",
-      yAlign: "bottom",
-      backgroundColor: "#fff",
-      titleFontSize: 24,
-      titleFontColor: "#333",
-      titleAlign: "center",
-      bodyFontColor: "#333",
-      xPadding: 10,
-      cornerRadius: 0,
-      titleMarginBottom: 0,
-      displayColors: false,
-      callbacks: {
-        title: (tooltipItem: any) => {
-          return tooltipItem[0].value;
-        }
-      }
-    }
-  };
+  options: any;
 
   constructor(private stateService: StateService) {
     super();
@@ -52,11 +28,36 @@ export class GraphPieComponent extends BaseComponent implements OnInit {
         this.loading = loading;
       });
 
-    this.domains = this.stateService.domains;
+    this.createOptions();
   }
 
   getHeight(): string {
     return this.stateService.getHeight();
+  }
+
+  createOptions(): void {
+    this.options = {
+      responsive: true,
+      tooltips: {
+        enabled: true,
+        mode: "nearest",
+        yAlign: "bottom",
+        backgroundColor: "#fff",
+        titleFontSize: 24,
+        titleFontColor: "#333",
+        titleAlign: "center",
+        bodyFontColor: "#333",
+        xPadding: 10,
+        cornerRadius: 0,
+        titleMarginBottom: 0,
+        displayColors: false,
+        callbacks: {
+          title: (tooltipItem: any) => {
+            return tooltipItem[0].value;
+          }
+        }
+      }
+    };
   }
 
   showGraph(): boolean {

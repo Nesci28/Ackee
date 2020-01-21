@@ -31,8 +31,8 @@
 - [x] FEATURE - Add event to the Tracker
 - [x] FEATURE - Show event in the Front-end
   - [x] BUG - Show hourglass
-  - [ ] Add Date range selector
-- [ ] FIX - Url dropdown in Pages
+  - [x] Add Date range selector
+- [x] FIX - Url dropdown in Pages
 - [x] BUG - Durations -> .toFixed(2)
 - [x] BUG - Views.Visited Times -> Main graph height
 - [x] Date range -> Input -> Put a debounce before calling the backend

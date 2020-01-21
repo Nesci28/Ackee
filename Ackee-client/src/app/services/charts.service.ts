@@ -26,14 +26,17 @@ export class ChartsService {
     return labels;
   }
 
-  createChartPieLabel(data: any): string[] {
-    const arr = [];
-    data.data.forEach((el: any) => {
-      if (el.name.osName) arr.push(el.name.osName);
-      if (el.name.platform && el.count > 0) arr.push(el.name.platform);
+  createChartPieLabel(data: any): string[][] {
+    const chartLabels = [];
+    this.stateService.domains.forEach(domain => {
+      chartLabels.push(
+        data
+          .filter((el: any) => el.domainId === domain.id)
+          .map((el: any) => el.id)
+      );
     });
 
-    return arr;
+    return chartLabels;
   }
 
   createChartLabelTime(): string[] {
@@ -47,7 +50,6 @@ export class ChartsService {
   }
 
   createChartEventSingle(data: any): any {
-    console.log("data :", data);
     const chartData = [];
     const chart = data.map((el: any) => Object.values(el.events));
 
@@ -57,6 +59,32 @@ export class ChartsService {
       chartData.push([
         {
           data: el,
+          backgroundColor: colorArr,
+          hoverBackgroundColor: "#73fac8",
+          hoverBorderColor: "#73fac8"
+        }
+      ]);
+    });
+
+    return chartData;
+  }
+
+  createChartPieAll(data: any, labels: string[][]): any {
+    const chartData: any = [];
+
+    this.stateService.domains.forEach((domain: AppDomains, i: number) => {
+      const domainEntries = data.filter((el: any) => el.domainId === domain.id);
+      const label = labels[i];
+      const tempArr = [];
+      label.forEach((l: string) => {
+        tempArr.push(domainEntries.filter((el: any) => el.id === l)[0].count);
+      });
+
+      const colorArr = this.getColorArr(tempArr);
+
+      chartData.push([
+        {
+          data: tempArr,
           backgroundColor: colorArr,
           hoverBackgroundColor: "#73fac8",
           hoverBorderColor: "#73fac8"

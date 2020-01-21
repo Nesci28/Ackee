@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 
 import { State } from "../../models/app.enum";
 import { StateService } from "../../services/state.service";
@@ -8,12 +8,10 @@ import { StateService } from "../../services/state.service";
   templateUrl: "./header.component.html",
   styleUrls: ["./header.component.scss"]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   State = State;
 
   constructor(private stateService: StateService) {}
-
-  ngOnInit() {}
 
   getRoute(): string {
     return this.stateService.state$.value;

@@ -271,10 +271,12 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe(async (recalculate: boolean) => {
         if (recalculate) {
+          this.stateService.loading$.next(true);
           this.createChartLabel();
           await this.getData();
           this.createChartData();
           this.stateService.recalculate$.next(false);
+          this.stateService.loading$.next(false);
         }
       });
   }

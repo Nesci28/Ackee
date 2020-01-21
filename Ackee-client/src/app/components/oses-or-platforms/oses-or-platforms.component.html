@@ -1,26 +1,18 @@
 <div>
-  <form [formGroup]="form" class="mb-3">
-    <div class="w-100 d-flex-responsive mb-1">
-      <input
-        (change)="inputChanged()"
-        type="number"
-        formControlName="numberOfDays"
-        class="mr-2 btn-reponsive btn-reponsive-mb-2"
-      />
-      <div
-        class="btn-group btn-group-toggle btn-reponsive-mb-3"
-        ngbRadioGroup
-        name="radioBasic"
-        formControlName="radioChoice"
-        (change)="radioChoiceChanged()"
-      >
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="selected" />Selected Dates
-        </label>
-        <label ngbButtonLabel class="btn-outline-secondary">
-          <input ngbButton type="radio" value="all" />All Time
-        </label>
-      </div>
+  <form [formGroup]="form" class="mb-3 w-100">
+    <div
+      class="btn-group btn-group-toggle mb-1"
+      ngbRadioGroup
+      name="radioBasic"
+      formControlName="radioChoice"
+      (change)="radioChoiceChanged()"
+    >
+      <label ngbButtonLabel class="btn-outline-secondary">
+        <input ngbButton type="radio" value="selected" />Selected Dates
+      </label>
+      <label ngbButtonLabel class="btn-outline-secondary">
+        <input ngbButton type="radio" value="all" />All Time
+      </label>
     </div>
     <app-date-picker-range></app-date-picker-range>
   </form>
@@ -31,10 +23,14 @@
       <div class="card">
         <div class="card-body">
           <h3 class="text-left">
-            {{ domain.title }}
+            {{ domain.title | titlecase }}
           </h3>
+          <div *ngIf="loading">
+            <app-loading-in-card [type]="'sub'"></app-loading-in-card>
+          </div>
           <app-graph-pie
-            [domain]="domain"
+            *ngIf="!loading"
+            [loadingType]="'sub'"
             [chartData]="chartData[i]"
             [chartLabels]="chartLabels[i]"
           ></app-graph-pie>
