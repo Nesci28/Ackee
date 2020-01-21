@@ -3,11 +3,9 @@
 const oses = require('../database/oses');
 
 const response = entry => ({
-  id: {
-    osName: entry._id,
-  },
+  id: entry._id.osName,
+  domainId: entry._id.domainId,
   count: entry.count,
-  created: entry.created,
 });
 
 const responses = entries => ({

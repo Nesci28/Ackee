@@ -3,9 +3,8 @@
 const oses = require('../database/platforms');
 
 const response = entry => ({
-  id: {
-    platform: entry._id,
-  },
+  id: entry._id.size,
+  domainId: entry._id.domainId,
   count: entry.count,
 });
 
