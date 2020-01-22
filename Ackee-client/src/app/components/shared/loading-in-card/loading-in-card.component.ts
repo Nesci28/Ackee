@@ -1,16 +1,14 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input } from "@angular/core";
 
 @Component({
   selector: "app-loading-in-card",
   templateUrl: "./loading-in-card.component.html",
   styleUrls: ["./loading-in-card.component.scss"]
 })
-export class LoadingInCardComponent implements OnInit {
+export class LoadingInCardComponent {
   @Input() type: string;
 
   constructor() {}
-
-  ngOnInit() {}
 
   getHeight(): string {
     let res: number;

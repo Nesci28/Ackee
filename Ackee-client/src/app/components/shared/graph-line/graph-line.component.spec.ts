@@ -1,16 +1,19 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { GraphLineComponent } from './graph-line.component';
+import { GraphLineComponent } from "./graph-line.component";
+import { AppModule } from "../../../app.module";
+import { APP_BASE_HREF } from "@angular/common";
 
-describe('GraphLineComponent', () => {
+describe("GraphLineComponent", () => {
   let component: GraphLineComponent;
   let fixture: ComponentFixture<GraphLineComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ GraphLineComponent ]
-    })
-    .compileComponents();
+      imports: [AppModule],
+      declarations: [],
+      providers: [{ provide: APP_BASE_HREF, useValue: "/" }]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +22,15 @@ describe('GraphLineComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  describe("ngOnInit", () => {
+    it("should generate Options", () => {
+      component.ngOnInit();
+      expect(typeof component.options).toBe("object");
+      expect(typeof component.colors).toBe("object");
+    });
   });
 });

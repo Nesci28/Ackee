@@ -36,7 +36,7 @@ export class DatePickerRangeComponent extends BaseComponent implements OnInit {
     this.initSubscription();
   }
 
-  onDateSelection(date: NgbDate) {
+  onDateSelection(date: NgbDate): void {
     this.stateService.start$.next(false);
     if (
       !this.stateService.fromDate$.value &&
@@ -56,7 +56,7 @@ export class DatePickerRangeComponent extends BaseComponent implements OnInit {
     }
   }
 
-  isHovered(date: NgbDate) {
+  isHovered(date: NgbDate): boolean {
     return (
       this.stateService.fromDate$.value &&
       !this.stateService.toDate$.value &&
@@ -66,14 +66,14 @@ export class DatePickerRangeComponent extends BaseComponent implements OnInit {
     );
   }
 
-  isInside(date: NgbDate) {
+  isInside(date: NgbDate): boolean {
     return (
       date.after(this.stateService.fromDate$.value) &&
       date.before(this.stateService.toDate$.value)
     );
   }
 
-  isRange(date: NgbDate) {
+  isRange(date: NgbDate): boolean {
     return (
       date.equals(this.stateService.fromDate$.value) ||
       date.equals(this.stateService.toDate$.value) ||

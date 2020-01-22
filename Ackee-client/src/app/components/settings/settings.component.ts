@@ -18,7 +18,6 @@ import { BaseComponent } from "../shared/base/base.component";
 export class SettingsComponent extends BaseComponent implements OnInit {
   domains: AppDomains[];
   Modal = Modal;
-  closeResult: string;
   typing: boolean = false;
 
   form = new FormGroup({
@@ -120,20 +119,8 @@ export class SettingsComponent extends BaseComponent implements OnInit {
             this.stateService.loading$.next(false);
           }
         },
-        reason => {
-          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-        }
+        _ => {}
       );
-  }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return "by pressing ESC";
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return "by clicking on a backdrop";
-    } else {
-      return `with: ${reason}`;
-    }
   }
 
   logOut(): void {

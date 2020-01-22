@@ -16,7 +16,8 @@
             >{{ page.count }}x</span
           >
           <span class="ml-2 text-secondary"
-            >{{ siteLocation }}{{ page.page || page.language }}</span
+            >{{ siteLocation
+            }}{{ page.page || page.language | titlecase }}</span
           >
         </div>
       </div>

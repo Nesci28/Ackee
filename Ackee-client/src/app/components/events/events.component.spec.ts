@@ -16,6 +16,11 @@ describe("EventsComponent", () => {
   let stateService: StateService;
   let httpService: HttpService;
 
+  const mock = {
+    type: "events",
+    data: [{ groupName: "group", events: { test: 1 } }]
+  };
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [AppModule, HttpClientTestingModule],
@@ -39,11 +44,7 @@ describe("EventsComponent", () => {
   });
 
   describe("ngOnInit", () => {
-    it("should return initialize all the variables", async () => {
-      const mock = {
-        type: "events",
-        data: [{ groupName: "group", events: { test: 1 } }]
-      };
+    it("should initialize all the variables", async () => {
       jest.spyOn(httpService, "getInfo").mockReturnValue(of(mock));
 
       await component.ngOnInit();
@@ -56,10 +57,6 @@ describe("EventsComponent", () => {
 
   describe("get Data", () => {
     it("should get the Data for all domains", async () => {
-      const mock = {
-        type: "events",
-        data: [{ groupName: "group", events: { test: 1 } }]
-      };
       jest.spyOn(httpService, "getInfo").mockReturnValue(of(mock));
       component.radioChoice.setValue(RadioChoices.all);
       await component.getData();
@@ -67,10 +64,6 @@ describe("EventsComponent", () => {
     });
 
     it("should get the Data for the specific domain", async () => {
-      const mock = {
-        type: "events",
-        data: [{ groupName: "group", events: { test: 1 } }]
-      };
       jest.spyOn(httpService, "getInfo").mockReturnValue(of(mock));
       component.radioChoice.setValue(RadioChoices.selected);
       await component.getData();
@@ -92,10 +85,6 @@ describe("EventsComponent", () => {
 
   describe("selectChanged", () => {
     it("should change the charts variables", async () => {
-      const mock = {
-        type: "events",
-        data: [{ groupName: "group", events: { test: 1 } }]
-      };
       jest.spyOn(httpService, "getInfo").mockReturnValue(of(mock));
       component.radioChoice.setValue(RadioChoices.all);
       await component.selectChanged();
@@ -119,10 +108,6 @@ describe("EventsComponent", () => {
     });
 
     it("should change the charts variables", async () => {
-      const mock = {
-        type: "events",
-        data: [{ groupName: "group", events: { test: 1 } }]
-      };
       jest.spyOn(httpService, "getInfo").mockReturnValue(of(mock));
       component.radioChoice.setValue(RadioChoices.all);
       await component.radioChoiceChanged();
@@ -182,10 +167,6 @@ describe("EventsComponent", () => {
     });
 
     it("should subscribe to recalculate$ and if true, change the charts variables", async () => {
-      const mock = {
-        type: "events",
-        data: [{ groupName: "group", events: { test: 1 } }]
-      };
       jest.spyOn(httpService, "getInfo").mockReturnValue(of(mock));
       component.radioChoice.setValue(RadioChoices.all);
 

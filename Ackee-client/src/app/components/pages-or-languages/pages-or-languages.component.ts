@@ -89,11 +89,7 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
   }
 
   createChartData(): void {
-    this.chartData = [];
-    this.chartData = this.chartsService.createChartTableAll(
-      this.data,
-      this.domains
-    );
+    this.chartData = this.chartsService.createChartTableAll(this.data);
   }
 
   filterChartDataDomain(domainId: string): any {
@@ -104,7 +100,6 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
 
   async radioChoiceChanged() {
     this.stateService.loading$.next(true);
-    this.chartData = [];
     if (this.radioChoice.value === RadioChoices.all) {
       this.stateService.datePickerDisable$.next(true);
     } else if (this.radioChoice.value === RadioChoices.selected) {
@@ -150,9 +145,7 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
   }
 
   showSpacer(index: number): boolean {
-    if (window.innerWidth > 991 && index > 1) return true;
-    if (window.innerWidth <= 991 && index > 0) return true;
-    return false;
+    return this.stateService.showSpacer(index);
   }
 
   initSubscriptions(): void {
@@ -181,6 +174,7 @@ export class PagesOrLanguagesComponent extends BaseComponent implements OnInit {
           this.stateService.loading$.next(true);
           await this.getData();
           this.createChartData();
+          this.generateSubUrls();
           this.stateService.recalculate$.next(false);
           this.stateService.loading$.next(false);
         }

@@ -28,7 +28,7 @@ export class ChartsService {
 
   createChartPieLabel(data: any): string[][] {
     const chartLabels = [];
-    this.stateService.domains.forEach(domain => {
+    this.stateService.domains.forEach((domain: AppDomains) => {
       chartLabels.push(
         data
           .filter((el: any) => el.domainId === domain.id)
@@ -95,11 +95,11 @@ export class ChartsService {
     return chartData;
   }
 
-  createChartTableAll(data: any, domains: AppDomains[]): any {
+  createChartTableAll(data: any): any {
     const chartData: any = [];
     let siteLocation = "";
 
-    domains.forEach((domain: AppDomains) => {
+    this.stateService.domains.forEach((domain: AppDomains) => {
       const tempData = [];
       if (this.stateService.state$.value === State.pages) {
         const filteredArr = data.filter((el: any) => el.domainId === domain.id);
@@ -123,7 +123,7 @@ export class ChartsService {
         );
         filteredArr.forEach((el: any) => {
           tempData.push({
-            language: languageList[el.data.id].nativeName,
+            language: languageList[el.data.id].nativeName.split(",")[0],
             count: el.data.count
           });
         });
@@ -297,6 +297,7 @@ export class ChartsService {
       chartData[0].data.data[index] = (eval(formula) / 60).toFixed(2);
     }
 
+    console.log("chartData :", chartData);
     return chartData;
   }
 

@@ -56,14 +56,7 @@
       <div *ngIf="showSpacer(i)" class="spacer"></div>
       <div class="card">
         <div class="card-body">
-          <h3
-            *ngIf="graphType !== Charts.bubble"
-            class="text-left pointer text-primary-hover"
-            (click)="moveToMain(i)"
-          >
-            {{ chartTitleName[i + 1] | titlecase }}
-          </h3>
-          <h3 *ngIf="graphType === Charts.bubble" class="text-left">
+          <h3 class="text-left">
             {{ chartTitleName[i + 1] | titlecase }}
           </h3>
           <div *ngIf="loading">

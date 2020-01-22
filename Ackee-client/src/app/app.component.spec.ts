@@ -1,35 +1,36 @@
-import { TestBed, async } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { AppComponent } from './app.component';
+import { APP_BASE_HREF } from "@angular/common";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-describe('AppComponent', () => {
+import { AppModule } from "./app.module";
+import { ViewsOrDurationsComponent } from "./components/views-or-durations/views-or-durations.component";
+import { HttpService } from "./services/http.service";
+import { StateService } from "./services/state.service";
+
+describe("AppComponent", () => {
+  let component: ViewsOrDurationsComponent;
+  let fixture: ComponentFixture<ViewsOrDurationsComponent>;
+
+  let stateService: StateService;
+  let httpService: HttpService;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
-      declarations: [
-        AppComponent
-      ],
+      imports: [AppModule],
+      declarations: [],
+      providers: [{ provide: APP_BASE_HREF, useValue: "/" }]
     }).compileComponents();
   }));
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app).toBeTruthy();
-  });
+  beforeEach(() => {
+    stateService = TestBed.get(StateService);
+    httpService = TestBed.get(HttpService);
 
-  it(`should have as title 'Ackee-client'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('Ackee-client');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
+    fixture = TestBed.createComponent(ViewsOrDurationsComponent);
+    component = fixture.componentInstance;
     fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('Ackee-client app is running!');
+  });
+
+  it("should create", () => {
+    expect(component).toBeTruthy();
   });
 });

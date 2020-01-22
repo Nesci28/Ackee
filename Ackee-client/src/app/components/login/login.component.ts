@@ -36,19 +36,11 @@ export class LoginComponent extends BaseComponent implements OnInit {
         .getDomains()
         .pipe(takeUntil(this.destroy$))
         .subscribe((domains: Domains) => {
-          const resDomains: AppDomains[] = [];
-          domains.data.forEach(domain => {
-            resDomains.push({
-              id: domain.data.id,
-              title: domain.data.title
-            });
-          });
-          this.stateService.domains = resDomains;
-          this.stateService.state$.next(State.views);
+          this.convertToAppDomains(domains);
         });
     } else if (isDevMode()) {
       this.username.setValue(environment.username);
-      this.password.setValue(environment.password);
+      // this.password.setValue(environment.password);
       this.login();
     }
   }
@@ -58,6 +50,18 @@ export class LoginComponent extends BaseComponent implements OnInit {
   }
   get password() {
     return this.form.get("password");
+  }
+
+  convertToAppDomains(domains: Domains) {
+    const resDomains: AppDomains[] = [];
+    domains.data.forEach(domain => {
+      resDomains.push({
+        id: domain.data.id,
+        title: domain.data.title
+      });
+    });
+    this.stateService.domains = resDomains;
+    this.stateService.state$.next(State.views);
   }
 
   login(): void {
@@ -75,15 +79,7 @@ export class LoginComponent extends BaseComponent implements OnInit {
               .getDomains()
               .pipe(takeUntil(this.destroy$))
               .subscribe((domains: Domains) => {
-                const resDomains: AppDomains[] = [];
-                domains.data.forEach(domain => {
-                  resDomains.push({
-                    id: domain.data.id,
-                    title: domain.data.title
-                  });
-                });
-                this.stateService.domains = resDomains;
-                this.stateService.state$.next(State.views);
+                this.convertToAppDomains(domains);
               });
           },
           (_: any) => {

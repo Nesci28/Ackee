@@ -176,15 +176,6 @@ export class ViewsOrDurationsComponent extends BaseComponent implements OnInit {
     }
   }
 
-  moveToMain(index: number): void {
-    const originalMain = this.chartData[0];
-    const originalTitle = this.chartTitleName[0];
-    this.chartData[0] = this.chartData[index + 1];
-    this.chartData[index + 1] = originalMain;
-    this.chartTitleName[0] = this.chartTitleName[index + 1];
-    this.chartTitleName[index + 1] = originalTitle;
-  }
-
   getTitle(): string {
     if (this.stateService.state$.value === State.views) {
       return this.views.value === "1" ? "Site views" : "Page views";

@@ -103,9 +103,7 @@ export class OsesOrPlatformsComponent extends BaseComponent implements OnInit {
   }
 
   showSpacer(index: number): boolean {
-    if (window.innerWidth > 991 && index > 1) return true;
-    if (window.innerWidth <= 991 && index > 0) return true;
-    return false;
+    return this.stateService.showSpacer(index);
   }
 
   initSubscriptions(): void {
